@@ -8,9 +8,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.drivetrain;
+import frc.robot.subsystems.intakelift;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.urcl.URCL;
@@ -26,18 +28,17 @@ import com.revrobotics.spark.config.SignalsConfig;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final drivetrain m_drivetrain = new drivetrain();
+  private final intakelift m_intakelift = new intakelift();
+
+  //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
+  //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
-  private final SignalsConfig m_SignalConfig = new SignalsConfig();
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-    m_SignalConfig.maxMotionSetpointVelocityAlwaysOn(true);
-    m_SignalConfig.absoluteEncoderVelocityAlwaysOn(true);
 
     // start data log
     DataLogManager.start();
@@ -46,11 +47,15 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     
+    // set the driving with stick command as the default drivetrain command 
     Command driveCommand = m_drivetrain.driveWithStick(
         () -> MathUtil.applyDeadband(m_driverController.getLeftY(),OperatorConstants.kDriveDeadband) * -1.0, 
         () -> MathUtil.applyDeadband(m_driverController.getLeftX(),OperatorConstants.kDriveDeadband) * -1.0,
         () -> MathUtil.applyDeadband(m_driverController.getRightX(),OperatorConstants.kDriveDeadband) * -1.0);
     m_drivetrain.setDefaultCommand(driveCommand);
+
+    // set the stall safety check command as the default command
+    m_intakelift.setDefaultCommand(m_intakelift.defaultCurrentSafetyCheck());
   }
 
   /**
@@ -66,9 +71,14 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(m_exampleSubsystem));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // Schedule intake deploy and retract using y and a buttons,
+    m_driverController.y().onTrue(m_intakelift.deployIntake());
+    m_driverController.a().onTrue(m_intakelift.retractIntake());
+    
+    m_driverController.x().onTrue(m_intakelift.simpleMotorSpeedControlCommand(-0.5));
+
+    // test setting encoder command
+    m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders,m_intakelift));
   }
 
   /**

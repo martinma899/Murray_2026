@@ -119,8 +119,38 @@ public final class Constants {
         .primaryEncoderVelocityAlwaysOn(true);       
     }
 
-
   }
+
+  public static class IntakeLiftingConstants {
+    public static int kLeftMotorCanID = 6;
+    public static int kRightMotorCanID = 5; 
+
+    public static boolean kLeftMotorInverted = false;
+    public static boolean kRightMotorInverted = false;
+
+    public static int kIntakeLiftMotorCurrentLimit = 30; // amp
+
+    public static double kIntakeLiftGearRatio = 30.0 ; // gear down 
+    public static double kPositionConversionFactor = 360.0 / kIntakeLiftGearRatio; // actuator degree / motor rotation
+
+    public static SparkMaxConfig kIntakeLiftConfig = new SparkMaxConfig(); // common intake motor lift configuration
+
+    static{
+        kIntakeLiftConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(kIntakeLiftMotorCurrentLimit);
+        kIntakeLiftConfig.encoder.positionConversionFactor(kPositionConversionFactor);
+        kIntakeLiftConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
+
+    public static double kIntakeDeployDutyCycle = 0.2; // constant duty cycle applied to deploy intake
+    public static double kIntakeRetractDutyCycle = -0.3; // constant duty cycle applied to retract intake
+
+    // these threshold are only used for safety and completion checks internal to the intakelift susystem itself
+    public static double kIntakeDeployedThreshold = 84.0; // deg, threshold beyond which intake is recognized as deployed
+    public static double kIntakeRetractedThreshold = 10; // deg, threshold beyond which intake is recognized as retracted
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.1;
