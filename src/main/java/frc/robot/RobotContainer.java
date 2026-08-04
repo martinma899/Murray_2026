@@ -9,6 +9,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.drivetrain;
 import frc.robot.subsystems.intakelift;
+import frc.robot.subsystems.intakeroller;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final drivetrain m_drivetrain = new drivetrain();
   private final intakelift m_intakelift = new intakelift();
+  private final intakeroller m_intakeroller = new intakeroller(); 
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
   //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);
@@ -56,6 +58,9 @@ public class RobotContainer {
 
     // set the stall safety check command as the default command
     m_intakelift.setDefaultCommand(m_intakelift.defaultCurrentSafetyCheck());
+
+    // set the stall safey check command as the default command
+    m_intakeroller.setDefaultCommand(m_intakeroller.defaultCurrentSafetyCheck());
   }
 
   /**
@@ -72,13 +77,20 @@ public class RobotContainer {
     // new Trigger(m_exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // Schedule intake deploy and retract using y and a buttons,
-    m_driverController.y().onTrue(m_intakelift.deployIntake());
-    m_driverController.a().onTrue(m_intakelift.retractIntake());
-    
-    m_driverController.x().onTrue(m_intakelift.simpleMotorSpeedControlCommand(-0.5));
+    m_driverController.y().onTrue(m_intakelift.deployIntakeCommand());
+    m_driverController.a().onTrue(m_intakelift.retractIntakeCommand());
 
     // test setting encoder command
-    m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders,m_intakelift));
+    m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders));
+
+    //m_driverController.x().onTrue(m_intakelift.simpleMotorSpeedControlCommand(-0.5));
+
+    // intake roller manual control commands and logic
+    Trigger intakeDown = new Trigger (m_intakelift::isIntakeDeployed);
+    Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
+    m_driverController.rightBumper().and(intakeDown).onTrue(m_intakeroller.turnOnIntakeCommand());
+    m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
+    intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
   }
 
   /**

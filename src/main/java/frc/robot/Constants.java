@@ -7,7 +7,6 @@ package frc.robot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SignalsConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -18,6 +17,12 @@ import com.revrobotics.spark.config.SignalsConfig;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+    public static final double kDriveDeadband = 0.1;
+  }
+
   public static class DrivetrainConstants {
     public static final int kLeftFrontMotorCANID = 2;
     public static final int kRightFrontMotorCANID = 3;
@@ -151,8 +156,26 @@ public final class Constants {
     public static double kIntakeRetractedThreshold = 10; // deg, threshold beyond which intake is recognized as retracted
   }
 
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.1;
+  public static class IntakeRollerConstants {
+    public static int kIntakeRollerMotorCanID = 7; 
+
+    public static boolean kIntakeRollerMotorInverted = false; 
+
+    public static int kIntakeRollerMotorCurrentLimit = 30; // amp
+
+    public static double kIntakeRollerInwardSpeed = 1.0; // intake in speed
+
+    public static double kIntakeRollerOutwardSpeed = -0.3; // intake reverse speed
+
+    public static SparkMaxConfig kIntakeRollerConfig = new SparkMaxConfig();
+
+    static{
+      kIntakeRollerConfig
+      .idleMode(IdleMode.kCoast)
+      .smartCurrentLimit(kIntakeRollerMotorCurrentLimit);
+      kIntakeRollerConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
   }
+
+
 }
