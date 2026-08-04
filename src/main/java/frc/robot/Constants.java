@@ -157,14 +157,12 @@ public final class Constants {
   }
 
   public static class IntakeRollerConstants {
+
     public static int kIntakeRollerMotorCanID = 7; 
-
     public static boolean kIntakeRollerMotorInverted = false; 
-
     public static int kIntakeRollerMotorCurrentLimit = 30; // amp
 
     public static double kIntakeRollerInwardSpeed = 1.0; // intake in speed
-
     public static double kIntakeRollerOutwardSpeed = -0.3; // intake reverse speed
 
     public static SparkMaxConfig kIntakeRollerConfig = new SparkMaxConfig();
@@ -175,6 +173,44 @@ public final class Constants {
       .smartCurrentLimit(kIntakeRollerMotorCurrentLimit);
       kIntakeRollerConfig.signals.primaryEncoderPositionAlwaysOn(true);
     }
+  }
+
+  public static class ElevatorConstants {
+
+    public static int kMotorCanID = 8; 
+    public static boolean kMotorInverted = true; 
+    public static int kMotorCurrentLimit = 40; // amp
+
+    public static double kSprocketPD = 2.149; // elevator drive sprocket PD, in
+    public static double kSprocketCirc = kSprocketPD * Math.PI; // elevator drive sprocket circumference, in
+    public static double kGearing = 27; // reduction
+
+    public static double kP = 6; // V per inch error, need tuning
+    public static double kI = 0.0;
+    public static double kD = 0.0;
+
+    public static double ks = 0; // static friction voltage gain
+    public static double kg = 0.2632; // V to hold lift stationary
+    public static double kv = 0.5073; // V per in/s
+    public static double ka = 0; // 
+
+
+    public static double kLowerLimitSoft = 0; // soft lower limit, in
+    public static double kUpperLimitSoft = 50; // soft upper limit, in
+
+    public static double kLowerLimitHard = 0; // soft lower limit, in
+    public static double kUpperLimitHard = 52.5; // soft upper limit, in
+
+    public static double kMaxVelocity = 12; // in/s
+    public static double kMaxAccel = 115.8661; // in/s/s = 0.3g
+    // public static SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
+
+    // static{
+    //   kElevatorConfig
+    //   .idleMode(IdleMode.kCoast)
+    //   .smartCurrentLimit(kElevatorMotorCurrentLimit);
+    //   kElevatorConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    // }
   }
 
 
