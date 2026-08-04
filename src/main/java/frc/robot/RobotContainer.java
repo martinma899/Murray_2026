@@ -10,6 +10,7 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.drivetrain;
 import frc.robot.subsystems.intakelift;
 import frc.robot.subsystems.intakeroller;
+import frc.robot.subsystems.elevator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.urcl.URCL;
+import static edu.wpi.first.units.Units.Inches;
 
 import com.revrobotics.spark.config.SignalsConfig;
 
@@ -31,6 +33,7 @@ public class RobotContainer {
   private final drivetrain m_drivetrain = new drivetrain();
   private final intakelift m_intakelift = new intakelift();
   private final intakeroller m_intakeroller = new intakeroller(); 
+  private final elevator m_elevator = new elevator();
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
   //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);
@@ -91,6 +94,9 @@ public class RobotContainer {
     m_driverController.rightBumper().and(intakeDown).onTrue(m_intakeroller.turnOnIntakeCommand());
     m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
+
+    m_driverController.leftBumper().onTrue(m_elevator.setHeight(Inches.of(12)));
+    m_driverController.leftTrigger().onTrue(m_elevator.setHeight(Inches.of(2)));
   }
 
   /**
