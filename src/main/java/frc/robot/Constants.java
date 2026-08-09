@@ -339,6 +339,11 @@ public final class Constants {
     // intake down boundary line 2
     public static double m3 = -0.282608696;
     public static double b3 = -11.16304348;
+
+    // this is the threshold that changes the arm limiting behavior when intake is down. 
+    // if arm is below this angle then it is recognized as being inside the downed intake and can only go down. 
+    // if arm is above this angle then it is recognized as being outside the downed intake and can only go up. 
+    public static double kArmLimitBehaviorChangePoint = -62.5; 
   }
 
 }

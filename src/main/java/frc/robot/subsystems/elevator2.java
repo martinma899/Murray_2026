@@ -22,6 +22,8 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.Safety;
+import frc.robot.SafetyUtilities;
 import yams.mechanisms.positional.Elevator;
 
 public class elevator2 extends SubsystemBase 
@@ -80,6 +82,37 @@ public class elevator2 extends SubsystemBase
 
     public Command increaseSetHeightCommand (double Height){
         return runOnce(() -> setCommandedPosition(m_elevatorController.getSetpoint() + Height));
+    }
+
+    public Command jogWithSafetyCommand(double speed, armlift m_armlift, intakelift m_intakelift){
+        return run(() -> setMotorSpeed(speed))
+        .until(() -> 
+        (speed < 0 & isLiftBottomed())
+        |(!m_intakelift.isIntakeDeployed() 
+          & m_armlift.isArmBottomed() 
+          & isLiftBottomed())
+        |(!m_intakelift.isIntakeDeployed() 
+          & SafetyUtilities.isInterfereIntakeUp(m_armlift.getArmPosition(),getElevatorPosition())
+          & speed < 0)
+        |(m_intakelift.isIntakeDeployed()
+          & SafetyUtilities.isInterfereIntakeDown(m_armlift.getArmPosition(),getElevatorPosition())
+          & m_armlift.getArmPosition() <= Safety.kArmLimitBehaviorChangePoint
+          & speed >= 0)
+        |(m_intakelift.isIntakeDeployed()
+          & SafetyUtilities.isInterfereIntakeDown(m_armlift.getArmPosition(),getElevatorPosition())
+          & m_armlift.getArmPosition() > Safety.kArmLimitBehaviorChangePoint
+          & speed < 0))
+        .finallyDo(() -> {
+            stopMotor();
+            if (!isLiftBottomed()){
+                setCommandedPosition(getElevatorPosition());
+            }
+        });
+    // 1. lift wants to go down and is bottomed
+    // 2. intake up, arm bottomed, lift bottomed
+    // 3. intake up, interfering, lift not bottomed, lift wants down
+    // 4. intake down, interfering, arm below behavior change point, lift wants up
+    // 5. intake down, interfering, arm above behavior change point, lift wants down
     }
 
     public void setMotorSpeed(double dutyCycle){
