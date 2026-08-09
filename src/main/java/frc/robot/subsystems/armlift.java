@@ -23,8 +23,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ElevatorConstants;
-import yams.mechanisms.positional.Elevator;
+import frc.robot.Constants.Safety;
+import frc.robot.SafetyUtilities;
+import frc.robot.subsystems.elevator2;
+import frc.robot.subsystems.intakelift;
 
 public class armlift extends SubsystemBase 
 {
@@ -85,6 +87,19 @@ public class armlift extends SubsystemBase
 
     public Command increaseSetAngleCommand (double Angle){
         return runOnce(() -> setCommandedPosition(m_armEncoder.getPosition() + Angle));
+    }
+
+    public Command jogWithSafetyCommand (double speed, elevator2 m_elevator, intakelift m_intakelift){
+        return run(() -> setMotorSpeed(speed))
+        .until(
+            () -> (m_intakelift.isIntakeDeployed() & SafetyUtilities.isInterfereIntakeDown(getArmPosition(),m_elevator.getElevatorPosition()))
+                | (!m_intakelift.isIntakeDeployed() & SafetyUtilities.isInterfereIntakeUp(getArmPosition(),m_elevator.getElevatorPosition()))
+                | isArmBottomed())
+        .finallyDo(() -> {
+            if (isArmBottomed()) {
+                stopMotor();}
+            else{
+                setCommandedPosition(getArmPosition());}});
     }
 
     public void setMotorSpeed(double dutyCycle){

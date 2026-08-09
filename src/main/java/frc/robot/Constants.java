@@ -321,6 +321,24 @@ public final class Constants {
       kArmMotorConfig.signals.primaryEncoderPositionAlwaysOn(true);
     }
   }
+  public static class Safety{
+    // multi-subsystem safety checks
 
+    // safety boundary lines 
+    // arm angle = x axis, elevator height = y axis
+    // arm angle: bottom = -82.28069095, unit = deg
+    // elevator height: bottom = 0, unit = in
+    // lines are y = mx + b
+    
+    // intake up boundary line
+    public static double m1 = -0.256295005; 
+    public static double b1 = -3.588130064;
+    // intake down boundary line 1
+    public static double m2 = 0.65;
+    public static double b2 = 47.125;
+    // intake down boundary line 2
+    public static double m3 = -0.282608696;
+    public static double b3 = -11.16304348;
+  }
 
 }
