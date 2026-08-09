@@ -40,4 +40,8 @@ public class ExampleCommand extends Command {
   public boolean isFinished() {
     return false;
   }
+
+  // only the initialize -> runOnce(lambda) 
+  // only do the execute -> run(lambda)
+  // run continuously until a condition -> run(lambda).until(lambda);
 }

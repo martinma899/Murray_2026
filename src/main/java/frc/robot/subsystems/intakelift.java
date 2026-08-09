@@ -84,6 +84,13 @@ public class intakelift extends SubsystemBase {
     .andThen(runOnce(() -> stopMotor()));
   }
 
+  // public Command deployIntakeCommand2(){
+  //   return run(() -> setMotorSpeed(IntakeLiftingConstants.kIntakeDeployDutyCycle))
+  //   .until(() -> isIntakeDeployed())
+  //   .withTimeout(1)
+  //   .andThen(runOnce(() -> stopMotor())); 
+  // }
+
    /** 
    * returns a command to retract the intake 
    */

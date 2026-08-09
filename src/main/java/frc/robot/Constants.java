@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -148,8 +150,8 @@ public final class Constants {
         kIntakeLiftConfig.signals.primaryEncoderPositionAlwaysOn(true);
     }
 
-    public static double kIntakeDeployDutyCycle = 0.2; // constant duty cycle applied to deploy intake
-    public static double kIntakeRetractDutyCycle = -0.3; // constant duty cycle applied to retract intake
+    public static double kIntakeDeployDutyCycle = 0.15; // constant duty cycle applied to deploy intake
+    public static double kIntakeRetractDutyCycle = -0.2; // constant duty cycle applied to retract intake
 
     // these threshold are only used for safety and completion checks internal to the intakelift susystem itself
     public static double kIntakeDeployedThreshold = 84.0; // deg, threshold beyond which intake is recognized as deployed
@@ -162,7 +164,7 @@ public final class Constants {
     public static boolean kIntakeRollerMotorInverted = false; 
     public static int kIntakeRollerMotorCurrentLimit = 30; // amp
 
-    public static double kIntakeRollerInwardSpeed = 1.0; // intake in speed
+    public static double kIntakeRollerInwardSpeed = 0.4; // intake in speed
     public static double kIntakeRollerOutwardSpeed = -0.3; // intake reverse speed
 
     public static SparkMaxConfig kIntakeRollerConfig = new SparkMaxConfig();
@@ -181,18 +183,27 @@ public final class Constants {
     public static boolean kMotorInverted = true; 
     public static int kMotorCurrentLimit = 40; // amp
 
-    public static double kSprocketPD = 2.149; // elevator drive sprocket PD, in
-    public static double kSprocketCirc = kSprocketPD * Math.PI; // elevator drive sprocket circumference, in
-    public static double kGearing = 27; // reduction
+    //public static double kSprocketPD = 2.149; // elevator drive sprocket PD, in
+    public static double kSprocketCirc = 6.3; // elevator drive sprocket circumference, in
+    public static double kGearing = 25; // reduction
 
-    public static double kP = 6; // V per inch error, need tuning
-    public static double kI = 0.0;
-    public static double kD = 0.0;
+    public static double kSpeedConversionFactor = 0.0042; // in/s per motor rpm
+    public static double kPositionConversionFactor = 0.252; // in per motor rotation
 
-    public static double ks = 0; // static friction voltage gain
-    public static double kg = 0.2632; // V to hold lift stationary
-    public static double kv = 0.5073; // V per in/s
-    public static double ka = 0; // 
+    public static double kP = 0.07; // V per in error, need tuning
+    public static double kI = 0.00005; // V per in error integral
+    // public static double kD = 0.5;
+    //public static double kI = 0.0002; // V per in error integral
+    public static double kD = 0.0000;
+
+    // kP 0.07
+    // kI 0.0002
+    // kD 10
+
+    public static double ks = 0.17076; // static friction voltage gain
+    public static double kg = 0.41614; // V to hold lift stationary
+    public static double kv = 0.495173; // V per in/s
+    public static double ka = 0.0010922; // V per in/s/s
 
 
     public static double kLowerLimitSoft = 0; // soft lower limit, in
@@ -201,16 +212,114 @@ public final class Constants {
     public static double kLowerLimitHard = 0; // soft lower limit, in
     public static double kUpperLimitHard = 52.5; // soft upper limit, in
 
-    public static double kMaxVelocity = 12; // in/s
-    public static double kMaxAccel = 115.8661; // in/s/s = 0.3g
-    // public static SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
+    public static double kMaxVelocity = 23.8392; // in/s
+    public static double kCruiseVelocity = 15; // in/s
+    public static double kMaxAccel = 386.2204724*0.05; // in/s/s = 1g
+    
+    public static double kAllowedCommandEndError = 0.1; // in, ends command when target is within this tolerance
 
-    // static{
-    //   kElevatorConfig
-    //   .idleMode(IdleMode.kCoast)
-    //   .smartCurrentLimit(kElevatorMotorCurrentLimit);
-    //   kElevatorConfig.signals.primaryEncoderPositionAlwaysOn(true);
-    // }
+    public static SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
+
+    static{
+      kElevatorConfig
+      .idleMode(IdleMode.kCoast)
+      .smartCurrentLimit(kMotorCurrentLimit)
+      .inverted(kMotorInverted);
+
+      kElevatorConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pid(kP, kI, kD)
+          .allowedClosedLoopError(0,ClosedLoopSlot.kSlot0)
+          .outputRange(-1, 1)
+          .iZone(1);
+        kElevatorConfig.closedLoop.feedForward
+        .kV(kv)
+        .kS(ks)
+        .kA(ka)
+        .kG(kg);
+       kElevatorConfig.closedLoop.maxMotion
+       .maxAcceleration(kMaxAccel)
+       .cruiseVelocity(kCruiseVelocity)
+       .allowedProfileError(12);
+       kElevatorConfig.encoder.velocityConversionFactor(kSpeedConversionFactor)
+       .positionConversionFactor(kPositionConversionFactor);
+
+      kElevatorConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
+  }
+
+   public static class ArmConstants {
+
+    public static int kMotorCanID = 11; 
+    public static boolean kMotorInverted = true; 
+    public static int kMotorCurrentLimit = 40; // amp
+
+    public static double kGearing = 120; // reduction
+
+    public static double kSpeedConversionFactor = 0.05; // deg/s per motor rpm
+    public static double kPositionConversionFactor = 3.0; // deg per motor rotation
+    public static double kCosRatio = 1.0/360.0; // mechanism rotation per degree
+  
+
+    public static double kP = 0.01; // V per deg error, need tuning
+    //public static double kP = 0.0; // V per deg error, need tuning
+    public static double kI = 0.00002; // V per deg error integral
+    //public static double kI = 0.0; // V per deg error integral
+    public static double kD = 0.000; // V per deg/s error
+
+    public static double ks = 0.24892*0.7; // static friction voltage gain
+    //public static double ks = 0; // static friction voltage gain
+    //public static double kg = 0.36249; // V to hold lift stationary
+    public static double kv = 0.03817777778; // V per deg/s
+    public static double ka = 0.089/360.0; // V per deg/s/s
+    public static double kcos = 0.36249; // V per rotation
+    //public static double kcos = 0.0; // V per rotation
+
+    public static double kStartingPosition = -82.28069095; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
+    //public static double kStartingPosition = 0; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
+
+    public static double kLowerLimitSoft = kStartingPosition; // soft lower limit, deg
+    public static double kUpperLimitSoft = 10.0; // soft upper limit, deg
+
+    public static double kLowerLimitHard = kStartingPosition; // soft lower limit, deg
+    public static double kUpperLimitHard = 10.0; // soft upper limit, deg
+
+    public static double kMaxVelocity = 283.8; // deg/s
+    public static double kCruiseVelocity = 180; // deg/s
+    public static double kMaxAccel = 180; // deg/s/s = 2s to 180 deg/s
+    
+    public static double kAllowedCommandEndError = 1; // deg, ends command when target is within this tolerance
+
+    public static SparkMaxConfig kArmMotorConfig = new SparkMaxConfig();
+
+    static{
+      kArmMotorConfig
+      .idleMode(IdleMode.kCoast)
+      .smartCurrentLimit(kMotorCurrentLimit)
+      .inverted(kMotorInverted);
+
+      kArmMotorConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .pid(kP, kI, kD)
+          .allowedClosedLoopError(0,ClosedLoopSlot.kSlot0)
+          .outputRange(-1, 1)
+          .iZone(10);
+        kArmMotorConfig.closedLoop.feedForward
+        .kV(kv,ClosedLoopSlot.kSlot0)
+        .kS(ks,ClosedLoopSlot.kSlot0)
+        .kA(ka,ClosedLoopSlot.kSlot0)
+        .kG(0,ClosedLoopSlot.kSlot0)
+        .kCos(kcos,ClosedLoopSlot.kSlot0)
+        .kCosRatio(kCosRatio,ClosedLoopSlot.kSlot0);
+       kArmMotorConfig.closedLoop.maxMotion
+       .maxAcceleration(kMaxAccel)
+       .cruiseVelocity(kCruiseVelocity)
+       .allowedProfileError(90);
+       kArmMotorConfig.encoder.velocityConversionFactor(kSpeedConversionFactor)
+       .positionConversionFactor(kPositionConversionFactor);
+
+      kArmMotorConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
   }
 
 

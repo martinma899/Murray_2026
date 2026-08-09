@@ -7,10 +7,11 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.armlift;
 import frc.robot.subsystems.drivetrain;
 import frc.robot.subsystems.intakelift;
 import frc.robot.subsystems.intakeroller;
-import frc.robot.subsystems.elevator;
+import frc.robot.subsystems.elevator2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.urcl.URCL;
 import static edu.wpi.first.units.Units.Inches;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.revrobotics.spark.config.SignalsConfig;
 
@@ -33,7 +35,8 @@ public class RobotContainer {
   private final drivetrain m_drivetrain = new drivetrain();
   private final intakelift m_intakelift = new intakelift();
   private final intakeroller m_intakeroller = new intakeroller(); 
-  private final elevator m_elevator = new elevator();
+  private final elevator2 m_elevator = new elevator2();
+  private final armlift m_armlift = new armlift();
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
   //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);
@@ -95,8 +98,35 @@ public class RobotContainer {
     m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
-    m_driverController.leftBumper().onTrue(m_elevator.setHeight(Inches.of(12)));
-    m_driverController.leftTrigger().onTrue(m_elevator.setHeight(Inches.of(2)));
+    m_driverController.povUp().onTrue(m_elevator.setHeightCommand(18));
+    m_driverController.povDown().onTrue(m_elevator.goToBottomCommand());
+    
+    //m_driverController.leftBumper().onTrue(m_armlift.increaseSetAngleCommand(10));
+    //m_driverController.leftTrigger().onTrue(m_armlift.increaseSetAngleCommand(-10));
+
+    m_driverController.povLeft().onTrue(m_armlift.setAngleCommand(-45));
+
+    //m_driverController.leftBumper().onTrue(m_armlift.setAngleCommand(0));
+    m_driverController.leftTrigger().onTrue(m_armlift.goToBottomCommand().andThen(m_elevator.goToBottomCommand()));
+
+    m_driverController.leftBumper().onTrue(m_elevator.goToHeightCommand(18)
+    .andThen(m_armlift.goToAngleCommand(0))
+    .andThen(m_elevator.goToHeightCommand(30))
+    .andThen(m_armlift.goToAngleCommand(-20)));
+
+   //m_driverController.leftBumper().onTrue(m_elevator.increaseSetHeightCommand(2));
+    //m_driverController.leftBumper().whileTrue();
+
+    // m_driverController.leftBumper().whileTrue(m_elevator.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // m_driverController.leftTrigger().whileTrue(m_elevator.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // m_driverController.leftBumper().and(m_driverController.x()).whileTrue(m_elevator.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // m_driverController.leftTrigger().and(m_driverController.x()).whileTrue(m_elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // m_driverController.leftBumper().whileTrue(m_armlift.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // m_driverController.leftTrigger().whileTrue(m_armlift.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // m_driverController.leftBumper().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // m_driverController.leftTrigger().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
   }
 
   /**
