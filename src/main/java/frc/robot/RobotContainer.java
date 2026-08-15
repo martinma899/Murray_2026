@@ -12,6 +12,7 @@ import frc.robot.subsystems.drivetrain;
 import frc.robot.subsystems.intakelift;
 import frc.robot.subsystems.intakeroller;
 import frc.robot.subsystems.elevator2;
+import frc.robot.subsystems.statemachine;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final intakeroller m_intakeroller = new intakeroller(); 
   private final elevator2 m_elevator = new elevator2();
   private final armlift m_armlift = new armlift();
+  private final statemachine m_statemachine = new statemachine(m_elevator,m_armlift,m_intakelift);
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
   //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);

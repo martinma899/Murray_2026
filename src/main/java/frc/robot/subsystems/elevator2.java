@@ -145,7 +145,7 @@ public class elevator2 extends SubsystemBase
 
     public boolean isLiftBottomed(){
         double pos = getElevatorPosition();
-        return pos <= 0.125;
+        return pos <= ElevatorConstants.kL0T;
     }
 
     public boolean isTargetReached(){

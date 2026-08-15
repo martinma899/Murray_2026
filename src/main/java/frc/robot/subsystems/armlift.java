@@ -153,7 +153,7 @@ public class armlift extends SubsystemBase
 
     public boolean isArmBottomed(){
         double pos = getArmPosition();
-        return pos <= ArmConstants.kLowerLimitHard + 3.0;
+        return pos <= ArmConstants.kA0T;
     }
 
     public boolean isTargetReached(){

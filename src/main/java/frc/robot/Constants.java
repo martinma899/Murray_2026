@@ -215,6 +215,13 @@ public final class Constants {
     public static double kMaxVelocity = 23.8392; // in/s
     public static double kCruiseVelocity = 15; // in/s
     public static double kMaxAccel = 386.2204724*0.05; // in/s/s = 1g
+
+    public static double kL0T = 0.125; // threshold below which lift is considered bottomed, in
+    public static double kLS = 7.0; // lift safe arm deployment position intake down, in
+    public static double kLSU = 17.5; // lift safe arm deployment position intake up, in
+    public static double kLSD = 6.5; // intake down interference zone peak
+
+
     
     public static double kAllowedCommandEndError = 0.1; // in, ends command when target is within this tolerance
 
@@ -276,6 +283,8 @@ public final class Constants {
     //public static double kcos = 0.0; // V per rotation
 
     public static double kStartingPosition = -82.28069095; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
+    public static double kAT = 3.0; // tolerance from kStartingPosition to qualify lift as bottomed
+    public static double kA0T = kStartingPosition + kAT; // arm threshold below which arm is qualified as bottomed
     //public static double kStartingPosition = 0; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
 
     public static double kLowerLimitSoft = kStartingPosition; // soft lower limit, deg
