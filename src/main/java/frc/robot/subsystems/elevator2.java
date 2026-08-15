@@ -103,10 +103,14 @@ public class elevator2 extends SubsystemBase
           & m_armlift.getArmPosition() > Safety.kArmLimitBehaviorChangePoint
           & speed < 0))
         .finallyDo(() -> {
-            stopMotor();
-            if (!isLiftBottomed()){
+            if (isLiftBottomed()){
+                stopMotor();
+             } 
+             else{
                 setCommandedPosition(getElevatorPosition());
-            }
+             }
+                
+            
         });
     // 1. lift wants to go down and is bottomed
     // 2. intake up, arm bottomed, lift bottomed

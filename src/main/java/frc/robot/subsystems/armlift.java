@@ -110,9 +110,9 @@ public class armlift extends SubsystemBase
             & getArmPosition() > Safety.kArmLimitBehaviorChangePoint
             & speed < 0) )
         .finallyDo(() -> {
-            stopMotor();
+            
             if (isArmBottomed()) {
-                }
+                stopMotor();}
             else{
                 setCommandedPosition(getArmPosition());}});
     // ending conditions: 

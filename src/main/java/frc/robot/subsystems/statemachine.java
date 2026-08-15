@@ -19,7 +19,7 @@ public class statemachine extends SubsystemBase {
     private final armlift m_armlift; 
     private final intakelift m_intakelift;
 
-    private double currentState;
+    private int currentState;
 
     public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin) {
         // pass in the object references
@@ -53,7 +53,7 @@ public class statemachine extends SubsystemBase {
         }
 
         // check for state 8
-        if (!L2Bool & L3Bool){
+        if (!L2Bool & !L3Bool){
             currentState = 8; 
             return; 
         }
@@ -88,6 +88,7 @@ public class statemachine extends SubsystemBase {
     }
 
     public void periodic() {
+        calcRegion();
         System.out.println("current state: " + currentState);
     }
 
