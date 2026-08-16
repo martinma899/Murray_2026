@@ -164,6 +164,7 @@ public class statemachine extends SubsystemBase {
     public Command testNextTransitionCommand (){
         // command such that when executed, tries to go to the next set of test positions specified in the test arrays
         return runOnce(() -> incrementTestArrayIndex())
+                .andThen(() -> setTestTargets())
                 .andThen(moveSystemCommandDefer());
     }
 
