@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.Constants.Safety;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.TestPositions;
+import frc.robot.Constants.IntakeLiftingConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.armlift;
@@ -28,12 +29,19 @@ public class statemachine extends SubsystemBase {
     private final intakelift m_intakelift;
 
     private int currentState;
+    private IntakeLiftingConstants.IntakePositions intakeState;
+
+    private int testArrayInd = 0; 
+    private int testArrayLength = TestPositions.armTestTargetArray.length;
 
     private double armTarget = TestPositions.a51; 
     private double liftTarget = TestPositions.l51;
+    
+    private IntakeLiftingConstants.IntakePositions intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
 
-    // make basic building block commands
-    private Command doNothing = runOnce(() -> {});
+    // make static basic building block commands
+    private Command doNothing = run(() -> {});
+    private Command liftToLS;
 
     public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin) {
         // pass in the object references
@@ -58,18 +66,25 @@ public class statemachine extends SubsystemBase {
 
         Command returnCommand = runOnce(() -> {}); 
 
-        System.out.println("current state: " + currentState);
-        System.out.println("new state: " + desiredState);
+        System.out.println("current lift position: " + m_elevator.getElevatorPosition() + " in");
+        System.out.println("current arm position: " + m_armlift.getArmPosition() + " deg");
+        System.out.println("current lift + arm state: " + currentState);
+        System.out.println("current intake state: " + intakeState);
+        
+        System.out.println("new lift position: " + liftTarget + " in");
+        System.out.println("new arm position: " + armTarget + " deg");
+        System.out.println("new lift + arm state: " + desiredState);
+        System.out.println("new intake state: " + intakeTarget);
 
-
+        if (intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED
+            & intakeState == IntakeLiftingConstants.IntakePositions.RETRACTED) {
 
         switch (currentState) {
             case 1:
                 switch (desiredState) {
-                    case 1:
-                        returnCommand = runOnce(() -> {}); break; //1 to 1, intake up to up, do nothing
-                        
-                    case 5:
+                    case 1: //1 to 1, intake up to up, do nothing
+                        returnCommand = runOnce(() -> {}); break; 
+                    case 5: // 1 to 5, intake up to up, works, tested on 8/15/26
                         returnCommand = m_intakelift.deployIntakeCommand()
                                 .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
                                 .andThen(m_armlift.goToAngleCommand(armTarget))
@@ -77,41 +92,89 @@ public class statemachine extends SubsystemBase {
                                 .andThen(m_elevator.goToHeightCommand(liftTarget));
                         break;
                     case 7:
+                        returnCommand = m_intakelift.deployIntakeCommand()
+                        .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
+                        .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                                m_elevator.goToHeightCommand(liftTarget)))
+                        .andThen(m_intakelift.retractIntakeCommand());
                         break;
                     default:
+                        System.out.println("Commanded position will self interfere. Doing nothing.");
                         break;
                 }
                 break;
             case 5:
                 switch (desiredState) {
                     case 1:
+                        returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                        .andThen(Commands.parallel(m_armlift.goToBottomCommand(),
+                                                                    m_intakelift.deployIntakeCommand()))
+                                        .andThen(m_elevator.goToBottomCommand())
+                                        .andThen(m_intakelift.retractIntakeCommand());
                         break;
                     case 5:
+                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                                        m_elevator.goToHeightCommand(liftTarget));
                         break;
                     case 7:
+                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                                        m_elevator.goToHeightCommand(liftTarget));
                         break;
                     default:
+                        System.out.println("Commanded position will self interfere. Doing nothing.");
                         break;
                 }
                 break;
             case 7:
                 switch (desiredState) {
                     case 1:
+                        returnCommand = Commands.parallel(m_elevator.goToHeightCommand(ElevatorConstants.kLSU),
+                                                            m_armlift.goToBottomCommand())
+                                        .andThen(m_intakelift.deployIntakeCommand())
+                                        .andThen(m_elevator.goToBottomCommand())
+                                        .andThen(m_intakelift.retractIntakeCommand());
                         break;
                     case 5:
+                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                                        m_elevator.goToHeightCommand(liftTarget));
                         break;
                     case 7:
+                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                                        m_elevator.goToHeightCommand(liftTarget));
                         break;
                     default:
                         break;
                 }
                 break;
             default:
+                System.out.println("Commanded position will self interfere. Doing nothing.");
                 break;
         }
+    }
+    else 
+    {
+        System.out.println("Intake down commands are not written yet.");
+    }
 
+        returnCommand = returnCommand.finallyDo(() -> {System.out.println("Multi subsystem movement command completed.");});
         return returnCommand;
          
+    }
+
+    public Command testNextTransitionCommand (){
+        // command such that when executed, tries to go to the next set of test positions specified in the test arrays
+        return runOnce(() -> incrementTestArrayIndex())
+                .andThen(moveSystemCommandDefer());
+    }
+
+    public void setCommandedPositions(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+        armTarget = armPos;
+        liftTarget = liftPos;
+        intakeTarget = intakePos;
+    }
+
+    public Command setCommandedPositionsCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+        return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos));
     }
 
     public int calcState (double armPos, double liftPos){
@@ -174,7 +237,28 @@ public class statemachine extends SubsystemBase {
 
     public void updateState(){
         currentState = calcState(m_armlift.getArmPosition(),m_elevator.getElevatorPosition());
+        if (!m_intakelift.isIntakeDeployed()){
+            intakeState = IntakeLiftingConstants.IntakePositions.RETRACTED;
+        }else{
+            intakeState = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+        }
     }
+
+    public void incrementTestArrayIndex(){
+        if (testArrayInd == testArrayLength - 1){// if at the end of array
+            testArrayInd = 0; // loop back to 0 index
+        } else { // if not at end of array
+            testArrayInd ++; // increment index
+        }
+    }
+
+    public void setTestTargets(){
+        // this method sets the internal targets using the current test array index
+        armTarget = TestPositions.armTestTargetArray[testArrayInd];
+        liftTarget = TestPositions.liftTestTargetArray[testArrayInd];
+        intakeTarget = TestPositions.intakeTestTargetArray[testArrayInd];
+    }
+
     public void periodic() {
         //updateState();
         //System.out.println("current state: " + currentState);

@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import frc.robot.Constants.IntakeLiftingConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.TestPositions;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.armlift;
@@ -129,7 +131,14 @@ public class RobotContainer {
     // m_driverController.leftBumper().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // m_driverController.leftTrigger().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    m_driverController.povLeft().whileTrue(m_statemachine.moveSystemCommandDefer());
+    // m_driverController.povLeft().whileTrue(m_statemachine.setCommandedPositionsCommand(TestPositions.a51,TestPositions.l51,
+    //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
+    //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
+    // m_driverController.povRight().whileTrue(m_statemachine.setCommandedPositionsCommand(TestPositions.a11,TestPositions.l11,
+    //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
+    //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
+
+    m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand());
 
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));

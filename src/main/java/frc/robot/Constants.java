@@ -156,6 +156,11 @@ public final class Constants {
     // these threshold are only used for safety and completion checks internal to the intakelift susystem itself
     public static double kIntakeDeployedThreshold = 84.0; // deg, threshold beyond which intake is recognized as deployed
     public static double kIntakeRetractedThreshold = 10; // deg, threshold beyond which intake is recognized as retracted
+
+    public static enum IntakePositions{
+      DEPLOYED, RETRACTED
+    }
+
   }
 
   public static class IntakeRollerConstants {
@@ -388,6 +393,25 @@ public final class Constants {
     public static double l71 = 10;
     public static double l72 = 20;
 
+    public static double[] armTestTargetArray = {
+      a11,a12,a51,a52,a71,a72,a51,a11,a71,a11 // intake up to intake up state 1 5 7 tests
+    };
+    public static double[] liftTestTargetArray = {
+      l11,l12,l51,l52,l71,l72,l51,l11,l71,l11 // intake up to intake up state 1 5 7 tests
+    };
+    public static IntakeLiftingConstants.IntakePositions[] intakeTestTargetArray = 
+    {
+      IntakeLiftingConstants.IntakePositions.RETRACTED, // intake up to intake up state 1 5 7 tests
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED,
+      IntakeLiftingConstants.IntakePositions.RETRACTED
+    };
   }
 
 }
