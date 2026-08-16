@@ -355,4 +355,39 @@ public final class Constants {
     public static double kArmLimitBehaviorChangePoint = -62.5; 
   }
 
+  public static class TestPositions {
+    // list of positions that test state 1 - 7 transitions
+    // each state has two sets of positions
+    // example: a12 = arm position, testing state 1, set 2
+    public static double a11 = -82.28069095;
+    public static double a12 = -80.78069095;
+    public static double a21 = -80.78069095;
+    public static double a22 = -82.28069095;
+    public static double a31 = -70;
+    public static double a32 = -75;
+    public static double a41 = -50;
+    public static double a42 = -22;
+    public static double a51 = -15;
+    public static double a52 = 10;
+    public static double a61 = -75;
+    public static double a62 = -52;
+    public static double a71 = -22;
+    public static double a72 = -62;
+    public static double l11 = 0;
+    public static double l12 = 0.0625;
+    public static double l21 = 5;
+    public static double l22 = 15;
+    public static double l31 = 5;
+    public static double l32 = 2;
+    public static double l41 = 5.5;
+    public static double l42 = 1.5;
+    public static double l51 = 5;
+    public static double l52 = 1.25;
+    public static double l61 = 14;
+    public static double l62 = 8;
+    public static double l71 = 10;
+    public static double l72 = 20;
+
+  }
+
 }
