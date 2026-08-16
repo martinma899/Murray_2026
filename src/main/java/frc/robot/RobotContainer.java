@@ -100,7 +100,7 @@ public class RobotContainer {
     m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
-    m_driverController.povRight().onTrue(m_elevator.setHeightCommand(18));
+    //m_driverController.povRight().onTrue(m_elevator.setHeightCommand(18));
     //m_driverController.povDown().onTrue(m_elevator.goToBottomCommand());
     
     //m_driverController.leftBumper().onTrue(m_armlift.increaseSetAngleCommand(10));
@@ -128,6 +128,8 @@ public class RobotContainer {
     // m_driverController.leftTrigger().whileTrue(m_armlift.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // m_driverController.leftBumper().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // m_driverController.leftTrigger().and(m_driverController.x()).whileTrue(m_armlift.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    m_driverController.povLeft().whileTrue(m_statemachine.moveSystemCommandDefer());
 
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
