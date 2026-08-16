@@ -218,7 +218,7 @@ public final class Constants {
 
     public static double kL0T = 0.125; // threshold below which lift is considered bottomed, in
     public static double kLS = 7.0; // lift safe arm deployment position intake down, in
-    public static double kLSU = 17.5; // lift safe arm deployment position intake up, in
+    public static double kLSU = 19; // lift safe arm deployment position intake up, in
     public static double kLSD = 6.5; // intake down interference zone peak
 
 
@@ -340,8 +340,8 @@ public final class Constants {
     // lines are y = mx + b
     
     // intake up boundary line
-    public static double m1 = -0.256295005; 
-    public static double b1 = -3.588130064;
+    public static double m1 = -0.259277031; 
+    public static double b1 = -2.333493282;
     // intake down boundary line 1
     public static double m2 = 0.65;
     public static double b2 = 47.125;
