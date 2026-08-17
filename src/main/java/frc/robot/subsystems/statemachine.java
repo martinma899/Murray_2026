@@ -40,7 +40,7 @@ public class statemachine extends SubsystemBase {
     private IntakeLiftingConstants.IntakePositions intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
 
     // make static basic building block commands
-    private Command doNothing = run(() -> {});
+    private Command doNothing = runOnce(() -> {});
     private Command liftToLS;
 
     public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin) {
@@ -59,106 +59,166 @@ public class statemachine extends SubsystemBase {
             
     }
 
-    // the method that returns the correct command to move things based on the current and desired state
-    public Command moveSystemCommand(){
+    // the method that returns the correct command to move things based on the
+    // current and desired state
+    public Command moveSystemCommand() {
         updateState(); // first get the current state of the system
         int desiredState = calcState(armTarget, liftTarget); // get the desired state of the system
 
-        Command returnCommand = runOnce(() -> {}); 
+        Command returnCommand = runOnce(() -> {
+        });
 
         System.out.println("current lift position: " + m_elevator.getElevatorPosition() + " in");
         System.out.println("current arm position: " + m_armlift.getArmPosition() + " deg");
         System.out.println("current lift + arm state: " + currentState);
         System.out.println("current intake state: " + intakeState);
-        
+
         System.out.println("new lift position: " + liftTarget + " in");
         System.out.println("new arm position: " + armTarget + " deg");
         System.out.println("new lift + arm state: " + desiredState);
         System.out.println("new intake state: " + intakeTarget);
 
         if (intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED
-            & intakeState == IntakeLiftingConstants.IntakePositions.RETRACTED) {
+                & intakeState == IntakeLiftingConstants.IntakePositions.RETRACTED) { // intake up tp intake up
+                                                                                     // transitions
 
-        switch (currentState) {
-            case 1:
-                switch (desiredState) {
-                    case 1: //1 to 1, intake up to up, do nothing
-                        returnCommand = runOnce(() -> {}); break; 
-                    case 5: // 1 to 5, intake up to up, works, tested on 8/15/26
-                        returnCommand = m_intakelift.deployIntakeCommand()
-                                .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
-                                .andThen(m_armlift.goToAngleCommand(armTarget))
-                                .andThen(m_intakelift.retractIntakeCommand())
-                                .andThen(m_elevator.goToHeightCommand(liftTarget));
-                        break;
-                    case 7:
-                        returnCommand = m_intakelift.deployIntakeCommand()
-                        .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
-                        .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                m_elevator.goToHeightCommand(liftTarget)))
-                        .andThen(m_intakelift.retractIntakeCommand());
-                        break;
-                    default:
-                        System.out.println("Commanded position will self interfere. Doing nothing.");
-                        break;
-                }
-                break;
-            case 5:
-                switch (desiredState) {
-                    case 1:
-                        returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
-                                        .andThen(Commands.parallel(m_armlift.goToBottomCommand(),
-                                                                    m_intakelift.deployIntakeCommand()))
-                                        .andThen(m_elevator.goToBottomCommand())
-                                        .andThen(m_intakelift.retractIntakeCommand());
-                        break;
-                    case 5:
-                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                        m_elevator.goToHeightCommand(liftTarget));
-                        break;
-                    case 7:
-                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                        m_elevator.goToHeightCommand(liftTarget));
-                        break;
-                    default:
-                        System.out.println("Commanded position will self interfere. Doing nothing.");
-                        break;
-                }
-                break;
-            case 7:
-                switch (desiredState) {
-                    case 1:
-                        returnCommand = Commands.parallel(m_elevator.goToHeightCommand(ElevatorConstants.kLSU),
-                                                            m_armlift.goToBottomCommand())
-                                        .andThen(m_intakelift.deployIntakeCommand())
-                                        .andThen(m_elevator.goToBottomCommand())
-                                        .andThen(m_intakelift.retractIntakeCommand());
-                        break;
-                    case 5:
-                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                        m_elevator.goToHeightCommand(liftTarget));
-                        break;
-                    case 7:
-                        returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                        m_elevator.goToHeightCommand(liftTarget));
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                System.out.println("Commanded position will self interfere. Doing nothing.");
-                break;
+            switch (currentState) {
+                case 1:
+                    switch (desiredState) {
+                        case 1: // 1 to 1, intake up to up, do nothing tested on 8/15/26
+                            returnCommand = doNothing;
+                            break;
+                        case 5: // 1 to 5, intake up to up, works, tested on 8/15/26
+                            returnCommand = m_intakelift.deployIntakeCommand()
+                                    .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
+                                    .andThen(m_armlift.goToAngleCommand(armTarget))
+                                    .andThen(m_intakelift.retractIntakeCommand())
+                                    .andThen(m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        case 7: // 1 to 7 transition tested on 8/15/26
+                            returnCommand = m_intakelift.deployIntakeCommand()
+                                    .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
+                                    .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                            m_elevator.goToHeightCommand(liftTarget)))
+                                    .andThen(m_intakelift.retractIntakeCommand());
+                            break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                            break;
+                    }
+                    break;
+                case 5: 
+                    switch (desiredState) {
+                        case 1: // 5 to 1 transition tested on 8/15/26
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                    .andThen(Commands.parallel(m_armlift.goToBottomCommand(),
+                                            m_intakelift.deployIntakeCommand()))
+                                    .andThen(m_elevator.goToBottomCommand())
+                                    .andThen(m_intakelift.retractIntakeCommand());
+                            break;
+                        case 5: // 5 to 5 transition tested on 8/15/26
+                            returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                    m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        case 7: // 5 to 7 transition tested on 8/15/26
+                            returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                    m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                            break;
+                    }
+                    break;
+                case 7: 
+                    switch (desiredState) {
+                        case 1: // 7 to 1 transition tested on 8/15/26
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(ElevatorConstants.kLSU),
+                                    m_armlift.goToBottomCommand())
+                                    .andThen(m_intakelift.deployIntakeCommand())
+                                    .andThen(m_elevator.goToBottomCommand())
+                                    .andThen(m_intakelift.retractIntakeCommand());
+                            break;
+                        case 5: // 7 to 5 transition tested on 8/15/26
+                            returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                    m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        case 7: // 7 to 7 transition tested on 8/15/26
+                            returnCommand = Commands.parallel(m_armlift.goToAngleCommand(armTarget),
+                                    m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    System.out.println("Current position is self interfering. Doing nothing.");
+                    break;
+            }
+        } else if (intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED
+                & intakeState == IntakeLiftingConstants.IntakePositions.DEPLOYED) { // deployed to deployed transitions
+            switch (currentState) {
+                case 1:
+                    switch (desiredState) {
+                        case 1: // 1 to 1 transition
+                            returnCommand = doNothing;
+                            break;
+                        case 2: // 1 to 2 transition
+                            returnCommand = m_elevator.goToHeightCommand(liftTarget);
+                            break;
+                        case 3: // 1 to 3 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                            m_armlift.goToAngleCommand(armTarget));
+                            break;
+                        case 4: // 1 to 4 transition
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(m_armlift.goToAngleCommand(armTarget))
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        case 5: // 1 to 5 transition
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(m_armlift.goToAngleCommand(armTarget))
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                            break;
+                        case 6: // 1 to 6 transition
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                        m_armlift.goToAngleCommand(armTarget)));
+                            break;
+                        case 7: // 1 to 7 transition
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                        m_armlift.goToAngleCommand(armTarget)));
+                            break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                            break;
+                    }
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    break;
+                default:
+                    System.out.println("Current position is self interfering. Doing nothing.");
+                    break;
+            }
+        } else {
+            System.out.println("Intake down commands are not written yet.");
         }
-    }
-    else 
-    {
-        System.out.println("Intake down commands are not written yet.");
-    }
 
-        returnCommand = returnCommand.finallyDo(() -> {System.out.println("Multi subsystem movement command completed.");});
+        returnCommand = returnCommand.finallyDo(() -> {
+            System.out.println("Multi subsystem movement command completed.");
+        });
         return returnCommand;
-         
+
     }
 
     public Command testNextTransitionCommand (){
