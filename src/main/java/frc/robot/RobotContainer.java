@@ -138,7 +138,7 @@ public class RobotContainer {
     //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
     //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
 
-    m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand());
+    m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand2());
 
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));

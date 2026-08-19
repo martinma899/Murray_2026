@@ -39,6 +39,10 @@ public class statemachine extends SubsystemBase {
     
     private IntakeLiftingConstants.IntakePositions intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
 
+    private int stateTestOrderArrayLength = TestPositions.stateTestOrderArray.length;
+    private int[] testValueAlt_arm = {0,0,0,0,0,0,0};
+    private int[] testValueAlt_lift = {0,0,0,0,0,0,0};
+
     // make static basic building block commands
     private Command doNothing = runOnce(() -> {});
     private Command liftToLS;
@@ -160,7 +164,7 @@ public class statemachine extends SubsystemBase {
                 case 1:
                     switch (desiredState) {
                         case 1: // 1 to 1 transition
-                            returnCommand = doNothing;
+                            // return do nothing command by default
                             break;
                         case 2: // 1 to 2 transition
                             returnCommand = m_elevator.goToHeightCommand(liftTarget);
@@ -169,22 +173,12 @@ public class statemachine extends SubsystemBase {
                             returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
                                                             m_armlift.goToAngleCommand(armTarget));
                             break;
-                        case 4: // 1 to 4 transition
+                        case 4, 5: // 1 to 4 transition
                             returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
                                             .andThen(m_armlift.goToAngleCommand(armTarget))
                                             .andThen(m_elevator.goToHeightCommand(liftTarget));
                             break;
-                        case 5: // 1 to 5 transition
-                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
-                                            .andThen(m_armlift.goToAngleCommand(armTarget))
-                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
-                            break;
-                        case 6: // 1 to 6 transition
-                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
-                                            .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
-                                                                        m_armlift.goToAngleCommand(armTarget)));
-                            break;
-                        case 7: // 1 to 7 transition
+                        case 6, 7: // 1 to 6 transition
                             returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
                                             .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
                                                                         m_armlift.goToAngleCommand(armTarget)));
@@ -195,17 +189,156 @@ public class statemachine extends SubsystemBase {
                     }
                     break;
                 case 2:
+                    switch (desiredState) {
+                        case 1: // 2 to 1 transition
+                            returnCommand = m_elevator.goToBottomCommand();
+                        break;
+                        case 2: // 2 to 2 transition
+                            returnCommand = m_elevator.goToHeightCommand(liftTarget);
+                        break;
+                        case 3: // 2 to 3 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                        m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        case 4, 5: // 2 to 4 transition
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(m_armlift.goToAngleCommand(armTarget))
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 6, 7: // 2 to 6 transition
+                            if (m_elevator.getElevatorPosition() > ElevatorConstants.kLS) { // if lift above safety
+                                returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                  m_armlift.goToAngleCommand(armTarget));
+                            } else { // if lift below safety
+                                returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                  m_armlift.goToAngleCommand(armTarget)));
+                            }
+                        break;
+                        default:
+                        System.out.println("Commanded position will self interfere. Doing nothing.");
+                        break;
+                    }
                     break;
                 case 3:
+                    switch (desiredState) {
+                        case 1: // 3 to 1 transition
+                            returnCommand = Commands.parallel(m_elevator.goToBottomCommand(),
+                                                            m_armlift.goToBottomCommand());
+                        break;
+                        case 2: // 3 to 2 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                               m_armlift.goToBottomCommand());
+                        break;
+                        case 3: // 3 to 3 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        case 4, 5: // 3 to 4 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(ElevatorConstants.kLS),
+                                                                m_armlift.goToBottomCommand())
+                                                    .andThen(m_armlift.goToAngleCommand(armTarget))
+                                                    .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 6, 7: // 3 to 6 7 transition
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(ElevatorConstants.kLS),
+                                                            m_armlift.goToBottomCommand())
+                                                    .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                                m_armlift.goToAngleCommand(armTarget)));
+                        break;
+                        default:
+                        System.out.println("Commanded position will self interfere. Doing nothing.");
+                        break;
+                    }
                     break;
-                case 4:
-                    break;
-                case 5:
+                case 4 , 5:
+                   switch (desiredState) {
+                        case 1: // 4 to 1
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(m_armlift.goToBottomCommand())
+                                            .andThen(m_elevator.goToBottomCommand());
+                        break;
+                        case 2: // 4 to 2
+                            if (liftTarget > ElevatorConstants.kLS) { // if lift target above safety
+                                returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                                .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                                m_armlift.goToBottomCommand()));
+                            }else{ // if lift target below safety
+                                returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                                .andThen(m_armlift.goToBottomCommand())
+                                                .andThen(m_elevator.goToHeightCommand(liftTarget));
+                            }
+                        break;
+                        case 3: // 4 to 3
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(m_armlift.goToAngleCommand(armTarget))
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 4, 5: // 4 to 4
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        case 6, 7: // 4 to 6
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                                            .andThen(Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                m_armlift.goToAngleCommand(armTarget)));
+                        break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                        break;
+                    }
                     break;
                 case 6:
+                    switch (desiredState) {
+                        case 1: // 6 to 1
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToBottomCommand());
+                        break; 
+                        case 2: // 6 to 2
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 3: // 6 to 3
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget))
+                                            .andThen(m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        case 4, 5: // 6 to 4 5
+                            returnCommand = m_armlift.goToAngleCommand(armTarget)
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 6, 7: // 6 to 6 7
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                        break;
+                    }
                     break;
-                case 7:
-                    break;
+               case 7:
+                    switch (desiredState) {
+                        case 1: // 7 to 1
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToBottomCommand());
+                        break; 
+                        case 2: // 7 to 2
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget));
+                        break;
+                        case 3: // 7 to 3
+                            returnCommand = m_armlift.goToBottomCommand()
+                                            .andThen(m_elevator.goToHeightCommand(liftTarget))
+                                            .andThen(m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        case 4, 5, 6, 7: // 7 to 4 5 6 7
+                            returnCommand = Commands.parallel(m_elevator.goToHeightCommand(liftTarget),
+                                                                m_armlift.goToAngleCommand(armTarget));
+                        break;
+                        default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
+                        break;
+                    }
                 default:
                     System.out.println("Current position is self interfering. Doing nothing.");
                     break;
@@ -257,7 +390,7 @@ public class statemachine extends SubsystemBase {
         }
 
         // check for state 2
-        if (armBottomedBool & !L3Bool){
+        if (armBottomedBool & !L1Bool){
             state = 2; 
             return state; 
         }
@@ -320,9 +453,151 @@ public class statemachine extends SubsystemBase {
         intakeTarget = TestPositions.intakeTestTargetArray[testArrayInd];
     }
 
+    public Command testNextTransitionCommand2 (){
+        // command such that when executed, tries to go to the next arm and lift state specified in the stateTestOrderArray
+        // actual arm and lift targets will alternate between set 1 and 2 every time a new target needs to be set
+        return runOnce(() -> incrementTestArrayIndex2())
+                .andThen(() -> setTestTargets2())
+                .andThen(moveSystemCommandDefer());
+    }
+
+    public void incrementTestArrayIndex2(){
+        if (testArrayInd == stateTestOrderArrayLength - 1){// if at the end of array
+            testArrayInd = 0; // loop back to 0 index
+        } else { // if not at end of array
+            testArrayInd ++; // increment index
+        }
+    }
+
+    public void setTestTargets2(){
+        // this method sets the internal targets using the current test array index
+        if (testValueAlt_arm[TestPositions.stateTestOrderArray[testArrayInd]-1] == 0){
+            switch (TestPositions.stateTestOrderArray[testArrayInd]){
+                case 1 :
+                    armTarget = TestPositions.a11;
+                    break;
+                case 2 :
+                    armTarget = TestPositions.a21;
+                    break;
+                case 3 : 
+                    armTarget = TestPositions.a31;
+                    break;
+                case 4 :
+                    armTarget = TestPositions.a41;
+                    break;
+                case 5 :
+                    armTarget = TestPositions.a51;
+                    break;
+                case 6 :
+                    armTarget = TestPositions.a61;
+                    break;
+                case 7 :
+                    armTarget = TestPositions.a71;
+                    break;
+            }
+            testValueAlt_arm[TestPositions.stateTestOrderArray[testArrayInd]-1] = 1;
+        }else{
+            switch (TestPositions.stateTestOrderArray[testArrayInd]){
+                case 1 :
+                    armTarget = TestPositions.a12;
+                    break;
+                case 2 :
+                    armTarget = TestPositions.a22;
+                    break;
+                case 3 : 
+                    armTarget = TestPositions.a32;
+                    break;
+                case 4 :
+                    armTarget = TestPositions.a42;
+                    break;
+                case 5 :
+                    armTarget = TestPositions.a52;
+                    break;
+                case 6 :
+                    armTarget = TestPositions.a62;
+                    break;
+                case 7 :
+                    armTarget = TestPositions.a72;
+                    break;
+            }
+            testValueAlt_arm[TestPositions.stateTestOrderArray[testArrayInd]-1] = 0;
+        }
+        if (testValueAlt_lift[TestPositions.stateTestOrderArray[testArrayInd]-1] == 0){
+            switch (TestPositions.stateTestOrderArray[testArrayInd]){
+                case 1 :
+                    liftTarget = TestPositions.l11;
+                    break;
+                case 2 :
+                    liftTarget = TestPositions.l21;
+                    break;
+                case 3 : 
+                    liftTarget = TestPositions.l31;
+                    break;
+                case 4 :
+                    liftTarget = TestPositions.l41;
+                    break;
+                case 5 :
+                    liftTarget = TestPositions.l51;
+                    break;
+                case 6 :
+                    liftTarget = TestPositions.l61;
+                    break;
+                case 7 :
+                    liftTarget = TestPositions.l71;
+                    break;
+            }
+            testValueAlt_lift[TestPositions.stateTestOrderArray[testArrayInd]-1] = 1;
+        }else{
+            switch (TestPositions.stateTestOrderArray[testArrayInd]){
+                case 1 :
+                    liftTarget = TestPositions.l12;
+                    break;
+                case 2 :
+                    liftTarget = TestPositions.l22;
+                    break;
+                case 3 : 
+                    liftTarget = TestPositions.l32;
+                    break;
+                case 4 :
+                    liftTarget = TestPositions.l42;
+                    break;
+                case 5 :
+                    liftTarget = TestPositions.l52;
+                    break;
+                case 6 :
+                    liftTarget = TestPositions.l62;
+                    break;
+                case 7 :
+                    liftTarget = TestPositions.l72;
+                    break;
+            }
+            testValueAlt_lift[TestPositions.stateTestOrderArray[testArrayInd]-1] = 0;
+        }
+        intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED; // for now test all deployed transitions
+    }
+
     public void periodic() {
         //updateState();
         //System.out.println("current state: " + currentState);
     }
 
 }
+
+                //    switch (desiredState) {
+                //         case 1:
+                //         break;
+                //         case 2:
+                //         break;
+                //         case 3:
+                //         break;
+                //         case 4:
+                //         break;
+                //         case 5:
+                //         break;
+                //         case 6:
+                //         break;
+                //         case 7:
+                //         break;
+                //         default:
+                //         break;
+                //     }
