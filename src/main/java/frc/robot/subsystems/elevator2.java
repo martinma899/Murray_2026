@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.MutVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import static edu.wpi.first.units.Units.Volts;
@@ -70,12 +71,14 @@ public class elevator2 extends SubsystemBase
 
     public Command goToHeightCommand (double Height){
         return runOnce(() -> setCommandedPosition(Height))
+        .andThen(new WaitCommand(0.1))
         .andThen(new WaitUntilCommand(() -> isTargetReached()))
         .withTimeout(5.0);
     }
 
     public Command goToBottomCommand(){
         return runOnce(() -> setCommandedPosition(0.0))
+            .andThen(new WaitCommand(0.1))
             .andThen(new WaitUntilCommand(() -> isLiftBottomed()))
             .andThen(runOnce(() -> stopMotor()));
     }

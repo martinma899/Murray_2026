@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.IntakeLiftingConstants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.TestPositions;
 import frc.robot.commands.Autos;
@@ -143,8 +144,12 @@ public class RobotContainer {
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
 
-    m_driverController.povUp().whileTrue(m_elevator.jogWithSafetyCommand(0.3,m_armlift,m_intakelift));
-    m_driverController.povDown().whileTrue(m_elevator.jogWithSafetyCommand(-0.3,m_armlift,m_intakelift));
+    m_driverController.povUp().whileTrue(m_elevator.jogWithSafetyCommand(0.5,m_armlift,m_intakelift));
+    m_driverController.povDown().whileTrue(m_elevator.jogWithSafetyCommand(-0.5,m_armlift,m_intakelift));
+
+    m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
+                                                                          0.0,
+                                                          IntakeLiftingConstants.IntakePositions.RETRACTED));
 
   }
 

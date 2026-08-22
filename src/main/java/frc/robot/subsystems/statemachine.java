@@ -44,14 +44,31 @@ public class statemachine extends SubsystemBase {
     private int[] testValueAlt_lift = {0,0,0,0,0,0,0};
 
     // make static basic building block commands
-    private Command doNothing = runOnce(() -> {});
-    private Command liftToLS;
+    //private Command doNothing = runOnce(() -> {});
+    //private Command liftToLS;
 
     public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin) {
         // pass in the object references
         m_elevator = elevatorin; 
         m_armlift = armliftin;
         m_intakelift = intakeliftin;
+    }
+
+// method to set the target actuator positions
+    public void setCommandedPositions(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+        armTarget = armPos;
+        liftTarget = liftPos;
+        intakeTarget = intakePos;
+    }
+
+    // returns the command to set the target actuator positions
+    public Command setCommandedPositionsCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+        return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos));
+    }
+
+    public Command moveSystemWrapperCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+        return setCommandedPositionsCommand(armPos, liftPos, intakePos)
+                .andThen(moveSystemCommandDefer());
     }
 
     // the main deferred command returning the correct command to move the things to the correct positions safely
@@ -70,8 +87,7 @@ public class statemachine extends SubsystemBase {
         updateState(); // first get the current state of the system
         int desiredState = calcState(armTarget, liftTarget); // get the desired state of the system
 
-        Command returnCommand = runOnce(() -> {
-        });
+        Command returnCommand = runOnce(() -> {});
 
         System.out.println("current lift position: " + m_elevator.getElevatorPosition() + " in");
         System.out.println("current arm position: " + m_armlift.getArmPosition() + " deg");
@@ -91,21 +107,14 @@ public class statemachine extends SubsystemBase {
                 case 1:
                     switch (desiredState) {
                         case 1: // 1 to 1, intake up to up, do nothing tested on 8/15/26
-                            returnCommand = doNothing;
+                            // by default return do nothing
                             break;
-                        case 5: // 1 to 5, intake up to up, works, tested on 8/15/26
+                        case 5, 7: // 1 to 5, intake up to up, works, tested on 8/15/26
                             returnCommand = m_intakelift.deployIntakeCommand()
-                                    .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
-                                    .andThen(m_armlift.goToAngleCommand(armTarget))
-                                    .andThen(m_intakelift.retractIntakeCommand())
-                                    .andThen(m_elevator.goToHeightCommand(liftTarget));
-                            break;
-                        case 7: // 1 to 7 transition tested on 8/15/26
-                            returnCommand = m_intakelift.deployIntakeCommand()
-                                    .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLS))
+                                    .andThen(m_elevator.goToHeightCommand(ElevatorConstants.kLSU))
                                     .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                            m_elevator.goToHeightCommand(liftTarget)))
-                                    .andThen(m_intakelift.retractIntakeCommand());
+                                                            m_intakelift.retractIntakeCommand()))
+                                    .andThen(m_elevator.goToHeightCommand(liftTarget));
                             break;
                         default:
                             System.out.println("Commanded position will self interfere. Doing nothing.");
@@ -115,7 +124,7 @@ public class statemachine extends SubsystemBase {
                 case 5: 
                     switch (desiredState) {
                         case 1: // 5 to 1 transition tested on 8/15/26
-                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLS)
+                            returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLSU)
                                     .andThen(Commands.parallel(m_armlift.goToBottomCommand(),
                                             m_intakelift.deployIntakeCommand()))
                                     .andThen(m_elevator.goToBottomCommand())
@@ -144,6 +153,7 @@ public class statemachine extends SubsystemBase {
                                     m_elevator.goToHeightCommand(liftTarget));
                             break;
                         default:
+                            System.out.println("Commanded position will self interfere. Doing nothing.");
                             break;
                     }
                     break;
@@ -664,22 +674,10 @@ public class statemachine extends SubsystemBase {
 
         returnCommand = returnCommand.finallyDo(() -> {
             System.out.println("Multi subsystem movement command completed.");
+            System.out.println();
         });
         return returnCommand;
 
-    }
-
-    
-    // method to set the target actuator positions
-    public void setCommandedPositions(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
-        armTarget = armPos;
-        liftTarget = liftPos;
-        intakeTarget = intakePos;
-    }
-
-    // returns the command to set the target actuator positions
-    public Command setCommandedPositionsCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
-        return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos));
     }
 
     // calculate arm and lift combined state
@@ -776,8 +774,10 @@ public class statemachine extends SubsystemBase {
     public Command testNextTransitionCommand2 (){
         // command such that when executed, tries to go to the next arm and lift state specified in the stateTestOrderArray
         // actual arm and lift targets will alternate between set 1 and 2 every time a new target needs to be set
-        return runOnce(() -> incrementTestArrayIndex2())
-                .andThen(() -> setTestTargets2())
+        return  //runOnce(() -> System.out.println("Running test number " + testArrayInd))
+                
+                runOnce(() -> setTestTargets2())
+                //.andThen(runOnce(() -> System.out.println("Running test number " + testArrayInd)))
                 .andThen(moveSystemCommandDefer());
     }
 
@@ -790,7 +790,8 @@ public class statemachine extends SubsystemBase {
     }
 
     public void setTestTargets2(){
-        // this method sets the internal targets using the current test array index
+        // this method sets the internal targets using the current test array index, and then increments the test array index
+        System.out.println("Running test number " + testArrayInd);
         if (testValueAlt_arm[TestPositions.stateTestOrderArray[testArrayInd]-1] == 0){
             switch (TestPositions.stateTestOrderArray[testArrayInd]){
                 case 1 :
@@ -899,6 +900,8 @@ public class statemachine extends SubsystemBase {
         } else { // 0 is retracted
             intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
         }
+
+        incrementTestArrayIndex2();
          
     }
 

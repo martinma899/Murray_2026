@@ -169,7 +169,7 @@ public final class Constants {
     public static boolean kIntakeRollerMotorInverted = false; 
     public static int kIntakeRollerMotorCurrentLimit = 30; // amp
 
-    public static double kIntakeRollerInwardSpeed = 0.4; // intake in speed
+    public static double kIntakeRollerInwardSpeed = 0.8; // intake in speed
     public static double kIntakeRollerOutwardSpeed = -0.3; // intake reverse speed
 
     public static SparkMaxConfig kIntakeRollerConfig = new SparkMaxConfig();
@@ -195,7 +195,7 @@ public final class Constants {
     public static double kSpeedConversionFactor = 0.0042; // in/s per motor rpm
     public static double kPositionConversionFactor = 0.252; // in per motor rotation
 
-    public static double kP = 0.07; // V per in error, need tuning
+    public static double kP = 0.12; // V per in error, need tuning 0.07 small, 0.2 too big
     public static double kI = 0.00005; // V per in error integral
     // public static double kD = 0.5;
     //public static double kI = 0.0002; // V per in error integral
@@ -252,7 +252,7 @@ public final class Constants {
        kElevatorConfig.closedLoop.maxMotion
        .maxAcceleration(kMaxAccel)
        .cruiseVelocity(kCruiseVelocity)
-       .allowedProfileError(12);
+       .allowedProfileError(1.0);
        kElevatorConfig.encoder.velocityConversionFactor(kSpeedConversionFactor)
        .positionConversionFactor(kPositionConversionFactor);
 
@@ -426,7 +426,7 @@ public final class Constants {
       6, 6, 7, 6, 
       7, 7,
       1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1,
-      5, 1, 5, 2, 5, 3, 5, 3, 5, 5, 5, 6, 5, 7, 5, 
+      5, 1, 5, 2, 5, 3, 5, 4, 5, 5, 5, 6, 5, 7, 5, 
       7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7, 7, 7
     };
     public static int[] stateTestIntakeArray = { // 1 = deployed
