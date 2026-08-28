@@ -15,6 +15,7 @@ import frc.robot.subsystems.drivetrain;
 import frc.robot.subsystems.intakelift;
 import frc.robot.subsystems.intakeroller;
 import frc.robot.subsystems.elevator2;
+import frc.robot.subsystems.wrist;
 import frc.robot.subsystems.statemachine;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -41,6 +42,7 @@ public class RobotContainer {
   private final intakeroller m_intakeroller = new intakeroller(); 
   private final elevator2 m_elevator = new elevator2();
   private final armlift m_armlift = new armlift();
+  private final wrist m_wrist = new wrist();
   private final statemachine m_statemachine = new statemachine(m_elevator,m_armlift,m_intakelift);
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
@@ -139,7 +141,11 @@ public class RobotContainer {
     //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
     //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
 
-    m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand2());
+    //m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand2());
+
+    // testing wrist movement
+    m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
+    m_driverController.povRight().onTrue(m_wrist.moveWristVerticalCommand());
 
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));

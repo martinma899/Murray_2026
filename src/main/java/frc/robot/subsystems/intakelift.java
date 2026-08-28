@@ -55,20 +55,6 @@ public class intakelift extends SubsystemBase {
 
   }
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
-
   public Command simpleMotorSpeedControlCommand(double speed) {
     // a simple command to set a motor speed
     return runOnce(() -> setMotorSpeed(speed));

@@ -163,6 +163,38 @@ public final class Constants {
 
   }
 
+  public static class WristConstants {
+    public static int kWristMotorCanID = 9;
+
+    public static boolean kWristMotorInverted = false;
+
+    public static int kWristMotorCurrentLimit = 20; // amp
+
+    public static double kWristGearRatio = 83.333333 ; // gear down 
+    public static double kPositionConversionFactor = 360.0 / kWristGearRatio; // actuator degree / motor rotation
+
+    public static SparkMaxConfig kWristConfig = new SparkMaxConfig(); // common intake motor lift configuration
+
+    static{
+        kWristConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(kWristMotorCurrentLimit);
+        kWristConfig.encoder.positionConversionFactor(kPositionConversionFactor);
+        kWristConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
+
+    public static double kWristDutyCycle = 0.5; // constant duty cycle applied to move wrist
+  
+    // these threshold are only used for safety and completion checks internal to the wrist susystem itself
+    public static double kWristVerticalThreshold = 85; // deg, threshold beyond which wrist is recognized as vertical
+    public static double kWristHorizontalThreshold = 1; // deg, threshold beyond which wrist is recognized as horizontal
+
+    public static enum WristPositions{
+      VERTICAL, HORIZONTAL
+    }
+
+  }
+
   public static class IntakeRollerConstants {
 
     public static int kIntakeRollerMotorCanID = 7; 
