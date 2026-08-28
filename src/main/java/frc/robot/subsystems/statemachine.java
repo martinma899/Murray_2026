@@ -32,7 +32,7 @@ public class statemachine extends SubsystemBase {
     private IntakeLiftingConstants.IntakePositions intakeState;
 
     private int testArrayInd = 0; 
-    private int testArrayLength = TestPositions.armTestTargetArray.length;
+    //private int testArrayLength = TestPositions.armTestTargetArray.length;
 
     private double armTarget = TestPositions.a51; 
     private double liftTarget = TestPositions.l51;

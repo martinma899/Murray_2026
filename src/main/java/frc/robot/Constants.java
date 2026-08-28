@@ -182,6 +182,30 @@ public final class Constants {
     }
   }
 
+  public static class ClawRollerConstants {
+
+    public static int kClawRollerMotorCanID = 10;
+    public static boolean kClawRollerMotorInverted = false;
+    public static int kClawRollerMotorCurrentLimit = 20; // amp
+
+    public static double kIntakeRollerInwardSpeed = 0.5; // intake in speed
+    public static double kIntakeRollerReleaseSpeed = -0.3; // intake reverse speed
+    public static double kIntakeRollerReleaseTime = 0.5; // release open time, s
+
+    public static double kIntakeGripSpeed = 0.1; // intake grip voltage in terms of duty cycle
+
+    public static int kCoralInClawThreshold = 5; // threshold above which coral is in claw
+
+    public static SparkMaxConfig kClawRollerConfig = new SparkMaxConfig();
+
+    static{
+      kClawRollerConfig
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(kClawRollerMotorCurrentLimit);
+      kClawRollerConfig.signals.primaryEncoderPositionAlwaysOn(true);
+    }
+  }
+
   public static class ElevatorConstants {
 
     public static int kMotorCanID = 8; 
