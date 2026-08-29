@@ -192,7 +192,6 @@ public final class Constants {
     public static enum WristPositions{
       VERTICAL, HORIZONTAL
     }
-
   }
 
   public static class IntakeRollerConstants {
@@ -222,11 +221,11 @@ public final class Constants {
 
     public static double kIntakeRollerInwardSpeed = 0.5; // intake in speed
     public static double kIntakeRollerReleaseSpeed = -0.3; // intake reverse speed
-    public static double kIntakeRollerReleaseTime = 0.5; // release open time, s
+    public static double kIntakeRollerReleaseTime = 0.2; // release open time, s
 
-    public static double kIntakeGripSpeed = 0.1; // intake grip voltage in terms of duty cycle
+    public static double kIntakeRollerGripSpeed = 0; // intake grip voltage in terms of duty cycle
 
-    public static int kCoralInClawThreshold = 5; // threshold above which coral is in claw
+    public static int kCoralInClawThreshold = 700; // threshold above which coral is in claw
 
     public static SparkMaxConfig kClawRollerConfig = new SparkMaxConfig();
 

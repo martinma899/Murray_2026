@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.I2C;
@@ -30,12 +31,17 @@ public class clawroller extends SubsystemBase{
         m_clawmotor.configure(ClawRollerConstants.kClawRollerConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        sensorReading = inst.getIntegerTopic("/ClawColorSensorIRReading").publish();
+        NetworkTable table = inst.getTable("MySubtable");
+        sensorReading = table.getIntegerTopic("ClawColorSensorIRReading").publish();
     }
 
     public Command turnOnRollerCommand (){
-        return runOnce(()-> {
-            setClawMotorSpeed(ClawRollerConstants.kIntakeRollerInwardSpeed);
+        return run(()-> {
+            if (isCoralInClaw()) {
+                setClawMotorSpeed(ClawRollerConstants.kIntakeRollerGripSpeed);
+            }else{
+                setClawMotorSpeed(ClawRollerConstants.kIntakeRollerInwardSpeed);
+            }
         });
     }
 

@@ -17,6 +17,7 @@ import frc.robot.subsystems.intakeroller;
 import frc.robot.subsystems.elevator2;
 import frc.robot.subsystems.wrist;
 import frc.robot.subsystems.statemachine;
+import frc.robot.subsystems.clawroller;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,6 +45,7 @@ public class RobotContainer {
   private final armlift m_armlift = new armlift();
   private final wrist m_wrist = new wrist();
   private final statemachine m_statemachine = new statemachine(m_elevator,m_armlift,m_intakelift);
+  private final clawroller m_clawroller = new clawroller();
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
   //private final Command m_simpleDeployIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(0.2);
@@ -94,7 +96,7 @@ public class RobotContainer {
     m_driverController.a().onTrue(m_intakelift.retractIntakeCommand());
 
     // test setting encoder command
-    m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders));
+    //m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders));
 
     //m_driverController.x().onTrue(m_intakelift.simpleMotorSpeedControlCommand(-0.5));
 
@@ -104,6 +106,13 @@ public class RobotContainer {
     m_driverController.rightBumper().and(intakeDown).onTrue(m_intakeroller.turnOnIntakeCommand());
     m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
+
+    m_driverController.rightBumper().and(intakeDown).onTrue(m_clawroller.turnOnRollerCommand());
+    m_driverController.rightTrigger().onTrue(m_clawroller.turnOffRollerCommand());
+    intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
+
+    // release coral command
+    m_driverController.b().onTrue(m_clawroller.releaseCoralCommand());
 
     //m_driverController.povRight().onTrue(m_elevator.setHeightCommand(18));
     //m_driverController.povDown().onTrue(m_elevator.goToBottomCommand());
@@ -146,6 +155,7 @@ public class RobotContainer {
     // testing wrist movement
     m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
     m_driverController.povRight().onTrue(m_wrist.moveWristVerticalCommand());
+
 
     m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
     m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
