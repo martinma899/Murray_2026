@@ -20,8 +20,10 @@ import frc.robot.subsystems.statemachine;
 import frc.robot.subsystems.clawroller;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.urcl.URCL;
@@ -76,6 +78,9 @@ public class RobotContainer {
 
     // set the stall safey check command as the default command
     m_intakeroller.setDefaultCommand(m_intakeroller.defaultCurrentSafetyCheck());
+
+    // buttons on the dashboard
+    // SmartDashboard.putBoolean("lift jog up", false);
   }
 
   /**
@@ -88,12 +93,13 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    
+
     // new Trigger(m_exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // Schedule intake deploy and retract using y and a buttons,
-    m_driverController.y().onTrue(m_intakelift.deployIntakeCommand());
-    m_driverController.a().onTrue(m_intakelift.retractIntakeCommand());
+    //m_driverController.y().onTrue(m_intakelift.deployIntakeCommand());
+    //m_driverController.a().onTrue(m_intakelift.retractIntakeCommand());
 
     // test setting encoder command
     //m_driverController.b().onTrue(Commands.runOnce(m_intakelift::zeroEncoders));
@@ -153,19 +159,37 @@ public class RobotContainer {
     //m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand2());
 
     // testing wrist movement
-    m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
-    m_driverController.povRight().onTrue(m_wrist.moveWristVerticalCommand());
+    //m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
+    //m_driverController.povRight().onTrue(m_wrist.moveWristVerticalCommand());
 
 
-    m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
-    m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
+    //m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
+    //m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
 
-    m_driverController.povUp().whileTrue(m_elevator.jogWithSafetyCommand(0.5,m_armlift,m_intakelift));
-    m_driverController.povDown().whileTrue(m_elevator.jogWithSafetyCommand(-0.5,m_armlift,m_intakelift));
+    //m_driverController.povUp().whileTrue(m_elevator.jogWithSafetyCommand(0.5,m_armlift,m_intakelift));
+    //m_driverController.povDown().whileTrue(m_elevator.jogWithSafetyCommand(-0.5,m_armlift,m_intakelift));
 
-    m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
+    // lift jog commands
+
+    SmartDashboard.putData("lift jog up",m_elevator.jogWithSafetyCommand(0.5,m_armlift,m_intakelift));
+    SmartDashboard.putData("lift jog down",m_elevator.jogWithSafetyCommand(-0.5,m_armlift,m_intakelift));
+    SmartDashboard.putData("arm jog up",m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
+    SmartDashboard.putData("arm jog down",m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
+    SmartDashboard.putData("intake deploy",m_intakelift.deployIntakeCommand());
+    SmartDashboard.putData("intake retract",m_intakelift.retractIntakeCommand());
+    SmartDashboard.putData("wrist horizontal",m_wrist.moveWristHorizontalCommand());
+    SmartDashboard.putData("wrist vertical",m_wrist.moveWristVerticalCommand());
+    SmartDashboard.putData("release coral",m_clawroller.releaseCoralCommand());
+    SmartDashboard.putData("system go home",m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
                                                                           0.0,
                                                           IntakeLiftingConstants.IntakePositions.RETRACTED));
+    SmartDashboard.putData("test next transition",m_statemachine.testNextTransitionCommand2());
+    //SmartDashboard.putData("turn on intake",)
+
+    // system safely go home command
+    // m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
+    //                                                                       0.0,
+    //                                                       IntakeLiftingConstants.IntakePositions.RETRACTED));
 
   }
 
