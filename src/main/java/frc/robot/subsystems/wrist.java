@@ -41,9 +41,9 @@ public class wrist extends SubsystemBase {
     public Command moveWristVerticalCommand() {
         return run(() -> setMotorSpeed(WristConstants.kWristDutyCycle))
                 .until(() -> isWristVertical())
-                .withTimeout(3.0)
-                .andThen(run(() -> {
-                }).withTimeout(0.25))
+                .withTimeout(2.0)
+                //.andThen(run(() -> {
+                //}).withTimeout(0.25))
                 .andThen(runOnce(() -> stopMotor()));
     }
 
@@ -53,9 +53,9 @@ public class wrist extends SubsystemBase {
     public Command moveWristHorizontalCommand() {
         return run(() -> setMotorSpeed(-1.0 * WristConstants.kWristDutyCycle))
                 .until(() -> isWristHorizontal())
-                .withTimeout(3.0)
-                .andThen(run(() -> {
-                }).withTimeout(0.25))
+                .withTimeout(2.0)
+                //.andThen(run(() -> {
+                //}).withTimeout(0.25))
                 .andThen(runOnce(() -> stopMotor()));
     }
 

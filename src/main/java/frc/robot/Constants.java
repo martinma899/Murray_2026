@@ -166,7 +166,7 @@ public final class Constants {
   public static class WristConstants {
     public static int kWristMotorCanID = 9;
 
-    public static boolean kWristMotorInverted = false;
+    public static boolean kWristMotorInverted = true;
 
     public static int kWristMotorCurrentLimit = 20; // amp
 
@@ -178,16 +178,17 @@ public final class Constants {
     static{
         kWristConfig
           .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(kWristMotorCurrentLimit);
+          .smartCurrentLimit(kWristMotorCurrentLimit)
+          .inverted(kWristMotorInverted);
         kWristConfig.encoder.positionConversionFactor(kPositionConversionFactor);
         kWristConfig.signals.primaryEncoderPositionAlwaysOn(true);
     }
 
-    public static double kWristDutyCycle = 0.5; // constant duty cycle applied to move wrist
+    public static double kWristDutyCycle = 0.2; // constant duty cycle applied to move wrist
   
     // these threshold are only used for safety and completion checks internal to the wrist susystem itself
-    public static double kWristVerticalThreshold = 85; // deg, threshold beyond which wrist is recognized as vertical
-    public static double kWristHorizontalThreshold = 1; // deg, threshold beyond which wrist is recognized as horizontal
+    public static double kWristVerticalThreshold = 90; // deg, threshold beyond which wrist is recognized as vertical
+    public static double kWristHorizontalThreshold = 10; // deg, threshold beyond which wrist is recognized as horizontal
 
     public static enum WristPositions{
       VERTICAL, HORIZONTAL
