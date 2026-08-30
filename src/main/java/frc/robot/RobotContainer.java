@@ -110,16 +110,20 @@ public class RobotContainer {
     // intake roller manual control commands and logic
     Trigger intakeDown = new Trigger (m_intakelift::isIntakeDeployed);
     Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
+    Trigger objectInClaw = new Trigger (m_clawroller::isCoralInClaw);
+
     m_driverController.rightBumper().and(intakeDown).onTrue(m_intakeroller.turnOnIntakeCommand());
     m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
+    objectInClaw.onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
     m_driverController.rightBumper().and(intakeDown).onTrue(m_clawroller.turnOnRollerCommand());
     m_driverController.rightTrigger().onTrue(m_clawroller.turnOffRollerCommand());
+
     intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
 
     // release coral command
-    m_driverController.b().onTrue(m_clawroller.releaseCoralCommand());
+    m_driverController.povUp().onTrue(m_clawroller.releaseCoralCommand());
 
     //m_driverController.povRight().onTrue(m_elevator.setHeightCommand(18));
     //m_driverController.povDown().onTrue(m_elevator.goToBottomCommand());
@@ -179,19 +183,13 @@ public class RobotContainer {
                           .onTrue(moveToCompetitionPositionCommand);
     
     // command to move the system to floor intake position on x button press
-    m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kAI,
-                                                                          ElevatorConstants.kLI,
-                                                                          IntakeLiftingConstants.IntakePositions.DEPLOYED));
+    m_driverController.x().onTrue(m_statemachine.moveToIntakePosCommand());
 
     // command to move the system to human handoff position on y button press
-    m_driverController.y().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kAH,
-                                                                          ElevatorConstants.kLH,
-                                                                          IntakeLiftingConstants.IntakePositions.DEPLOYED));
+    m_driverController.y().onTrue(m_statemachine.moveToHandoffPosCommand());
 
     // system safely go home command
-    m_driverController.back().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kA0,
-                                                                          ElevatorConstants.kL0,
-                                                                          IntakeLiftingConstants.IntakePositions.RETRACTED));
+    m_driverController.start().onTrue(m_statemachine.moveToStartingPosCommand());
 
 
     // testing wrist movement

@@ -279,7 +279,7 @@ public final class Constants {
     public static double kLC1 = 0; // lift position for coral scoring on L1
     public static double kLC2 = 5.21; // lift position for coral scoring on L2
     public static double kLC3 = 22.63; // lift position for coral scoring on L3
-    public static double kLC4 = 51.53; // lift position for coral scoring on L4
+    public static double kLC4 = 48; // lift position for coral scoring on L4
     
     public static double kAllowedCommandEndError = 0.1; // in, ends command when target is within this tolerance
 
@@ -345,7 +345,7 @@ public final class Constants {
     public static double kA0T = kA0 + kAT; // arm threshold below which arm is qualified as bottomed
     public static double kAI = -77.28069095; // deg, arm position for floor intake
     public static double kAH = -28.28069095; // deg, arm position for human handoff
-    public static double kAC1 = -10.11069095; // deg, arm position for L1 scoring
+    public static double kAC1 = -10.11069095+2; // deg, arm position for L1 scoring
     public static double kAC2 = -4.82069095; // deg, arm position for L2 scoring
     public static double kAC3 = -4.82069095; // deg, arm position for L3 scoring
     public static double kAC4 = -12.66069095; // deg, arm position for L4 scoring

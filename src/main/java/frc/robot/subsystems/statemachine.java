@@ -113,6 +113,27 @@ public class statemachine extends SubsystemBase {
                 .andThen(moveSystemCommandDefer());
     }
 
+    public Command moveToIntakePosCommand(){
+        return runOnce(()->competitionStateInd = 1)
+        .andThen(moveSystemWrapperCommand(ArmConstants.kAI,
+                                        ElevatorConstants.kLI,
+                                        IntakeLiftingConstants.IntakePositions.DEPLOYED));
+    }
+
+    public Command moveToHandoffPosCommand(){
+        return runOnce(()->competitionStateInd = 2)
+        .andThen(moveSystemWrapperCommand(ArmConstants.kAH,
+                                        ElevatorConstants.kLH,
+                                        IntakeLiftingConstants.IntakePositions.DEPLOYED));
+    }
+
+    public Command moveToStartingPosCommand(){
+        return runOnce(()->competitionStateInd = 0)
+        .andThen(moveSystemWrapperCommand(ArmConstants.kA0,
+                                        ElevatorConstants.kL0,
+                                        IntakeLiftingConstants.IntakePositions.RETRACTED));
+    }
+
     // the main deferred command returning the correct command to move the things to the correct positions safely
     // deferred command wrapper for moveSystemCommand method
     public Command moveSystemCommandDefer(){
@@ -587,8 +608,8 @@ public class statemachine extends SubsystemBase {
                             if (liftTarget > ElevatorConstants.kLSU) { // lift target above safety
                                 returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLSU)
                                         .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
-                                                m_intakelift.retractIntakeCommand()),
-                                                m_elevator.goToHeightCommand(liftTarget));
+                                                m_intakelift.retractIntakeCommand(),
+                                                m_elevator.goToHeightCommand(liftTarget)));
                             } else { // lift target below safety
                                 returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLSU)
                                         .andThen(Commands.parallel(m_armlift.goToAngleCommand(armTarget),
@@ -671,8 +692,8 @@ public class statemachine extends SubsystemBase {
                             if (liftTarget > ElevatorConstants.kLSU) { // lift target above safety
                                 returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLSU)
                                                 .andThen(Commands.parallel(m_intakelift.retractIntakeCommand(),
-                                                                        m_armlift.goToAngleCommand(armTarget)),
-                                                                        m_elevator.goToHeightCommand(liftTarget));  
+                                                                        m_armlift.goToAngleCommand(armTarget),
+                                                                        m_elevator.goToHeightCommand(liftTarget)));  
                             } else { // lift target below safety
                                 returnCommand = m_elevator.goToHeightCommand(ElevatorConstants.kLSU)
                                             .andThen(Commands.parallel(m_intakelift.retractIntakeCommand(),
