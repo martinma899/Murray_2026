@@ -244,7 +244,6 @@ public final class Constants {
     public static boolean kMotorInverted = true; 
     public static int kMotorCurrentLimit = 40; // amp
 
-    //public static double kSprocketPD = 2.149; // elevator drive sprocket PD, in
     public static double kSprocketCirc = 6.3; // elevator drive sprocket circumference, in
     public static double kGearing = 25; // reduction
 
@@ -253,19 +252,12 @@ public final class Constants {
 
     public static double kP = 0.12; // V per in error, need tuning 0.07 small, 0.2 too big
     public static double kI = 0.00005; // V per in error integral
-    // public static double kD = 0.5;
-    //public static double kI = 0.0002; // V per in error integral
     public static double kD = 0.0000;
-
-    // kP 0.07
-    // kI 0.0002
-    // kD 10
 
     public static double ks = 0.17076; // static friction voltage gain
     public static double kg = 0.41614; // V to hold lift stationary
     public static double kv = 0.495173; // V per in/s
     public static double ka = 0.0010922; // V per in/s/s
-
 
     public static double kLowerLimitSoft = 0; // soft lower limit, in
     public static double kUpperLimitSoft = 50; // soft upper limit, in
@@ -278,11 +270,16 @@ public final class Constants {
     public static double kMaxAccel = 386.2204724*0.05; // in/s/s = 1g
 
     public static double kL0T = 0.125; // threshold below which lift is considered bottomed, in
+    public static double kL0 = 0; // lift starting position, in
     public static double kLS = 7.0; // lift safe arm deployment position intake down, in
     public static double kLSU = 19; // lift safe arm deployment position intake up, in
     public static double kLSD = 6.5; // intake down interference zone peak
-
-
+    public static double kLH = 18.09; // lift position for human handoff
+    public static double kLI = 2; // lift floor intake position
+    public static double kLC1 = 0; // lift position for coral scoring on L1
+    public static double kLC2 = 5.21; // lift position for coral scoring on L2
+    public static double kLC3 = 22.63; // lift position for coral scoring on L3
+    public static double kLC4 = 51.53; // lift position for coral scoring on L4
     
     public static double kAllowedCommandEndError = 0.1; // in, ends command when target is within this tolerance
 
@@ -343,15 +340,20 @@ public final class Constants {
     public static double kcos = 0.36249; // V per rotation
     //public static double kcos = 0.0; // V per rotation
 
-    public static double kStartingPosition = -82.28069095; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
-    public static double kAT = 3.0; // tolerance from kStartingPosition to qualify lift as bottomed
-    public static double kA0T = kStartingPosition + kAT; // arm threshold below which arm is qualified as bottomed
-    //public static double kStartingPosition = 0; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
+    public static double kA0 = -82.28069095; // deg, set such that 0 = CG horizontal, from CAD measurement and calculation
+    public static double kAT = 3.0; // tolerance from starting position to qualify lift as bottomed
+    public static double kA0T = kA0 + kAT; // arm threshold below which arm is qualified as bottomed
+    public static double kAI = -77.28069095; // deg, arm position for floor intake
+    public static double kAH = -28.28069095; // deg, arm position for human handoff
+    public static double kAC1 = -10.11069095; // deg, arm position for L1 scoring
+    public static double kAC2 = -4.82069095; // deg, arm position for L2 scoring
+    public static double kAC3 = -4.82069095; // deg, arm position for L3 scoring
+    public static double kAC4 = -12.66069095; // deg, arm position for L4 scoring
 
-    public static double kLowerLimitSoft = kStartingPosition; // soft lower limit, deg
+    public static double kLowerLimitSoft = kA0; // soft lower limit, deg
     public static double kUpperLimitSoft = 10.0; // soft upper limit, deg
 
-    public static double kLowerLimitHard = kStartingPosition; // soft lower limit, deg
+    public static double kLowerLimitHard = kA0; // soft lower limit, deg
     public static double kUpperLimitHard = 10.0; // soft upper limit, deg
 
     public static double kMaxVelocity = 283.8; // deg/s

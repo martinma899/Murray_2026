@@ -139,7 +139,7 @@ public class elevator2 extends SubsystemBase
     }
 
     public void zeroEncoder(){
-        m_elevatorEncoder.setPosition(0);
+        m_elevatorEncoder.setPosition(ElevatorConstants.kL0);
     }
 
     public double getElevatorPosition(){

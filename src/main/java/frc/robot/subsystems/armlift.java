@@ -82,7 +82,7 @@ public class armlift extends SubsystemBase
     }
 
     public Command goToBottomCommand(){
-        return runOnce(() -> setCommandedPosition(ArmConstants.kStartingPosition))
+        return runOnce(() -> setCommandedPosition(ArmConstants.kA0))
             .andThen(new WaitCommand(0.1))
             .andThen(new WaitUntilCommand(() -> isArmBottomed()))
             .withTimeout(5.0)
@@ -144,7 +144,7 @@ public class armlift extends SubsystemBase
     }
 
     public void zeroEncoder(){
-        m_armEncoder.setPosition(ArmConstants.kStartingPosition);
+        m_armEncoder.setPosition(ArmConstants.kA0);
     }
 
     public double getArmPosition(){

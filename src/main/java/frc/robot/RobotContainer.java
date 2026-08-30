@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.IntakeLiftingConstants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.TestPositions;
 import frc.robot.commands.Autos;
@@ -156,10 +157,42 @@ public class RobotContainer {
     //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
     //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
 
+    // command to test the next transition in the state machine, for testing purposes
+    // implementation is with built in cancel current running copy of the command and to start it again, so rapid button presses advance the states quickly
     Command testTransitionCommand = m_statemachine.testNextTransitionCommand2();
-
     m_driverController.povLeft().onTrue(Commands.runOnce(testTransitionCommand::cancel))
     .onTrue(testTransitionCommand);
+
+    // command set to move among competition position sets
+    
+    // instantiate a single copy of the command to move to the currently commanded competition position index
+    Command moveToCompetitionPositionCommand = m_statemachine.moveToCompetitionPositionCommand();
+    // press b, increment competition position index as appropriate, cancel any currently running copy of the moveToCompetitionPositionCommand, 
+    // and then start a new copy of the command to move to the new competition position index
+    m_driverController.b().onTrue(m_statemachine.incrementCompetitionPositionCommand()
+                                  .andThen(Commands.runOnce(moveToCompetitionPositionCommand::cancel)))
+                          .onTrue(moveToCompetitionPositionCommand);
+    // press a, decrement competition position index as appropriate, cancel any currently running copy of the moveToCompetitionPositionCommand, 
+    // and then start a new copy of the command to move to the new competition position index
+    m_driverController.a().onTrue(m_statemachine.decrementCompetitionPositionCommand()
+                                  .andThen(Commands.runOnce(moveToCompetitionPositionCommand::cancel)))
+                          .onTrue(moveToCompetitionPositionCommand);
+    
+    // command to move the system to floor intake position on x button press
+    m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kAI,
+                                                                          ElevatorConstants.kLI,
+                                                                          IntakeLiftingConstants.IntakePositions.DEPLOYED));
+
+    // command to move the system to human handoff position on y button press
+    m_driverController.y().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kAH,
+                                                                          ElevatorConstants.kLH,
+                                                                          IntakeLiftingConstants.IntakePositions.DEPLOYED));
+
+    // system safely go home command
+    m_driverController.back().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kA0,
+                                                                          ElevatorConstants.kL0,
+                                                                          IntakeLiftingConstants.IntakePositions.RETRACTED));
+
 
     // testing wrist movement
     //m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
@@ -183,17 +216,11 @@ public class RobotContainer {
     SmartDashboard.putData("wrist horizontal",m_wrist.moveWristHorizontalCommand());
     SmartDashboard.putData("wrist vertical",m_wrist.moveWristVerticalCommand());
     SmartDashboard.putData("release coral",m_clawroller.releaseCoralCommand());
-    SmartDashboard.putData("system go home",m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
-                                                                          0.0,
-                                                          IntakeLiftingConstants.IntakePositions.RETRACTED));
+    SmartDashboard.putData("system go home",m_statemachine.moveSystemWrapperCommand(ArmConstants.kA0,
+                                                                                      ElevatorConstants.kL0,
+                                                                                      IntakeLiftingConstants.IntakePositions.RETRACTED));
     SmartDashboard.putData("test next transition",m_statemachine.testNextTransitionCommand2());
     //SmartDashboard.putData("turn on intake",)
-
-    // system safely go home command
-    // m_driverController.x().onTrue(m_statemachine.moveSystemWrapperCommand(ArmConstants.kStartingPosition,
-    //                                                                       0.0,
-    //                                                       IntakeLiftingConstants.IntakePositions.RETRACTED));
-
   }
 
   /**

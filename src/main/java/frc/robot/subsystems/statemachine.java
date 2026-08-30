@@ -37,9 +37,12 @@ public class statemachine extends SubsystemBase {
     // index to keep track of robot position in competition mode
     // 0 = starting position
     // 1 = floor intake position
-    // 2 = L1 scoring position
-    // 3 = L2 scoring position
-    // 4 = L3 scoring position
+    // 2 = human handoff position
+    // 3 = L1 scoring position
+    // 4 = L2 scoring position
+    // 5 = L3 scoring position
+    // 6 = L4 scoring position
+    
     private int competitionStateInd = 0; 
 
 
@@ -75,8 +78,38 @@ public class statemachine extends SubsystemBase {
         return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos));
     }
 
+    public Command testNextTransitionCommand2() {
+        // command such that when executed, tries to go to the next arm and lift state
+        // specified in the stateTestOrderArray
+        // actual arm and lift targets will alternate between set 1 and 2 every time a
+        // new target needs to be set
+        return runOnce(() -> setTestTargets2())
+                // .andThen(runOnce(() -> System.out.println("Running test number " +
+                // testArrayInd)))
+                .andThen(moveSystemCommandDefer());
+    }
+
+    // returns the command to move the system to the commanded positions safely
     public Command moveSystemWrapperCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
         return setCommandedPositionsCommand(armPos, liftPos, intakePos)
+                .andThen(moveSystemCommandDefer());
+    }
+
+    // returns the command to increment the competition position index
+    public Command incrementCompetitionPositionCommand(){
+        return runOnce(() -> incrementCompetitionStateIndex());
+    }
+
+    // returns the command to decrement the competition position index
+    public Command decrementCompetitionPositionCommand(){
+        return runOnce(() -> decrementCompetitionStateIndex());
+    }
+
+    // returns the command to set the target positions based on the current competition position index 
+    // and then move the system to those positions safely
+    public Command moveToCompetitionPositionCommand(){
+        
+        return runOnce(() -> setCompetitionTargets())
                 .andThen(moveSystemCommandDefer());
     }
 
@@ -86,7 +119,7 @@ public class statemachine extends SubsystemBase {
         // for now assume intake is up
         return Commands.defer(
             () -> {return moveSystemCommand();},
-            Set.of(this,m_elevator,m_armlift,m_intakelift));// update current state
+            Set.of(m_elevator,m_armlift,m_intakelift));// update current state
     }
 
     // the method that returns the correct command to move things based on the
@@ -780,16 +813,6 @@ public class statemachine extends SubsystemBase {
         intakeTarget = TestPositions.intakeTestTargetArray[testArrayInd];
     } */
 
-    public Command testNextTransitionCommand2 (){
-        // command such that when executed, tries to go to the next arm and lift state specified in the stateTestOrderArray
-        // actual arm and lift targets will alternate between set 1 and 2 every time a new target needs to be set
-        return  //runOnce(() -> System.out.println("Running test number " + testArrayInd))
-                
-                runOnce(() -> setTestTargets2())
-                //.andThen(runOnce(() -> System.out.println("Running test number " + testArrayInd)))
-                .andThen(moveSystemCommandDefer());
-    }
-
     public void incrementTestArrayIndex2(){
         if (testArrayInd == stateTestOrderArrayLength - 1){// if at the end of array
             testArrayInd = 0; // loop back to 0 index
@@ -912,6 +935,98 @@ public class statemachine extends SubsystemBase {
 
         incrementTestArrayIndex2();
          
+    }
+
+    public void incrementCompetitionStateIndex(){
+        switch (competitionStateInd){
+            case 0: // 0 = starting position
+                competitionStateInd = 1; // press button go to floor intake position
+                break;
+            case 1: // 1 = floor intake position
+                competitionStateInd = 3; // press button go to L1 scoring position
+                break;
+            case 2: // 2 = human handoff position
+                competitionStateInd = 3; // press button go to L1 scoring position
+                break;
+            case 3: // 3 = L1 scoring position
+                competitionStateInd = 4; // press button go to L2 scoring position
+                break;
+            case 4: // 4 = L2 scoring position
+                competitionStateInd = 5; // press button go to L3 scoring position
+                break;
+            case 5: // 5 = L3 scoring position
+                competitionStateInd = 6; // press button go to L4 scoring position
+                break;
+            case 6: // 6 = L4 scoring position
+                competitionStateInd = 6; // press button to stay in L4 scoring position
+                break;
+        }
+    }
+
+    public void decrementCompetitionStateIndex(){
+        switch (competitionStateInd){
+            case 0: // 0 = starting position
+                competitionStateInd = 0; // press button to stay in starting position
+                break;
+            case 1: // 1 = floor intake position
+                competitionStateInd = 1; // press button to stay in floor intake position
+                break;
+            case 2: // 2 = human handoff position
+                competitionStateInd = 1; // press button to stay in floor intake position
+                break;
+            case 3: // 3 = L1 scoring position
+                competitionStateInd = 1; // press button go to floor intake position
+                break;
+            case 4: // 4 = L2 scoring position
+                competitionStateInd = 3; // press button go to L1 scoring position
+                break;
+            case 5: // 5 = L3 scoring position
+                competitionStateInd = 4; // press button go to L2 scoring position
+                break;
+            case 6: // 6 = L4 scoring position
+                competitionStateInd = 5; // press button to stay in L3 scoring position
+                break;
+        }
+    }
+
+    public void setCompetitionTargets(){
+        switch (competitionStateInd){
+            case 0: // 0 = starting position
+                armTarget = ArmConstants.kA0;
+                liftTarget = ElevatorConstants.kL0;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                break;
+            case 1: // 1 = floor intake position
+                armTarget = ArmConstants.kAI;
+                liftTarget = ElevatorConstants.kLI;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+                break;
+            case 2: // 2 = human handoff position
+                armTarget = ArmConstants.kAH;
+                liftTarget = ElevatorConstants.kLH;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+                break;
+            case 3: // 3 = L1 scoring position
+                armTarget = ArmConstants.kAC1;
+                liftTarget = ElevatorConstants.kLC1;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                break;
+            case 4: // 4 = L2 scoring position
+                armTarget = ArmConstants.kAC2;
+                liftTarget = ElevatorConstants.kLC2;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                break;
+            case 5: // 5 = L3 scoring position
+                armTarget = ArmConstants.kAC3;
+                liftTarget = ElevatorConstants.kLC3;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                break;
+            case 6: // 6 = L4 scoring position
+                armTarget = ArmConstants.kAC4;
+                liftTarget = ElevatorConstants.kLC4;
+                intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                break; 
+        }
     }
 
     public void periodic() {
