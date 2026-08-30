@@ -31,8 +31,17 @@ public class statemachine extends SubsystemBase {
     private int currentState;
     private IntakeLiftingConstants.IntakePositions intakeState;
 
-    private int testArrayInd = 0; 
+    private int testArrayInd = 0; // index for the test position arrays
     //private int testArrayLength = TestPositions.armTestTargetArray.length;
+
+    // index to keep track of robot position in competition mode
+    // 0 = starting position
+    // 1 = floor intake position
+    // 2 = L1 scoring position
+    // 3 = L2 scoring position
+    // 4 = L3 scoring position
+    private int competitionStateInd = 0; 
+
 
     private double armTarget = TestPositions.a51; 
     private double liftTarget = TestPositions.l51;
