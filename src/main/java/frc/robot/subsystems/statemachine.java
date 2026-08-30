@@ -77,7 +77,7 @@ public class statemachine extends SubsystemBase {
         // for now assume intake is up
         return Commands.defer(
             () -> {return moveSystemCommand();},
-            Set.of(m_elevator,m_armlift,m_intakelift));// update current state
+            Set.of(this,m_elevator,m_armlift,m_intakelift));// update current state
     }
 
     // the method that returns the correct command to move things based on the

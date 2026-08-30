@@ -156,7 +156,10 @@ public class RobotContainer {
     //                                           IntakeLiftingConstants.IntakePositions.RETRACTED)
     //                                         .andThen(m_statemachine.moveSystemCommandDefer()));
 
-    //m_driverController.povLeft().onTrue(m_statemachine.testNextTransitionCommand2());
+    Command testTransitionCommand = m_statemachine.testNextTransitionCommand2();
+
+    m_driverController.povLeft().onTrue(Commands.runOnce(testTransitionCommand::cancel))
+    .onTrue(testTransitionCommand);
 
     // testing wrist movement
     //m_driverController.povLeft().onTrue(m_wrist.moveWristHorizontalCommand());
