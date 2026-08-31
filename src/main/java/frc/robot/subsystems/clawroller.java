@@ -73,6 +73,10 @@ public class clawroller extends SubsystemBase{
         return proximity > ClawRollerConstants.kCoralInClawThreshold;
     }
 
+    public boolean isCoralNotInClaw(){
+        return !isCoralInClaw();
+    }
+
     @Override
     public void periodic (){
         proximity = m_colorSensor.getProximity();

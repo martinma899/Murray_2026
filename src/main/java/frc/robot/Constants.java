@@ -275,7 +275,7 @@ public final class Constants {
     public static double kLSU = 19; // lift safe arm deployment position intake up, in
     public static double kLSD = 6.5; // intake down interference zone peak
     public static double kLH = 18.09; // lift position for human handoff
-    public static double kLI = 2; // lift floor intake position
+    public static double kLI = 1; // lift floor intake position
     public static double kLC1 = 0; // lift position for coral scoring on L1
     public static double kLC2 = 5.21; // lift position for coral scoring on L2
     public static double kLC3 = 22.63; // lift position for coral scoring on L3

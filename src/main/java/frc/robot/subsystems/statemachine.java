@@ -754,8 +754,8 @@ public class statemachine extends SubsystemBase {
 
         // append wrist command
         if (wristTarget == WristConstants.WristPositions.VERTICAL &
-            ((desiredState == 1 | desiredState == 2 | desiredState == 3) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)
-             | (desiredState == 1 & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED)) { 
+            (((desiredState == 1 | desiredState == 2 | desiredState == 3) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)
+             | (desiredState == 1 & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED))) { 
                 // all the cancel command cases
                 // wrist target is vertical, and target position is a situation that does not allow vertical wrist
                 // target stage 1 + intake up
@@ -765,13 +765,13 @@ public class statemachine extends SubsystemBase {
             returnCommand = runOnce(() -> {});
         } else if ( wristState == WristConstants.WristPositions.VERTICAL &
                     wristTarget == WristConstants.WristPositions.HORIZONTAL &
-            ((desiredState == 1 | desiredState == 5 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED
+            (((desiredState == 1 | desiredState == 5 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED)
                     | intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)) {
             // all the wrist flip at beginning cases, all the cases are vert to horiz flip
             returnCommand = m_wrist.moveWristHorizontalCommand().andThen(returnCommand);
         } else if( wristState == WristConstants.WristPositions.HORIZONTAL &
                    wristTarget == WristConstants.WristPositions.VERTICAL &
-            ((desiredState == 4 | desiredState == 5 | desiredState == 6 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED
+            (((desiredState == 4 | desiredState == 5 | desiredState == 6 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)
                     | ((desiredState == 5 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED))) {
             // all the wrist flip at end cases, all the cases are horiz to vert flip
             returnCommand = returnCommand.andThen(m_wrist.moveWristVerticalCommand());
@@ -1071,43 +1071,43 @@ public class statemachine extends SubsystemBase {
                 armTarget = ArmConstants.kA0;
                 liftTarget = ElevatorConstants.kL0;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
-                wristState = WristConstants.WristPositions.HORIZONTAL;
+                wristTarget = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 1: // 1 = floor intake position
                 armTarget = ArmConstants.kAI;
                 liftTarget = ElevatorConstants.kLI;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
-                wristState = WristConstants.WristPositions.HORIZONTAL;
+                wristTarget = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 2: // 2 = human handoff position
                 armTarget = ArmConstants.kAH;
                 liftTarget = ElevatorConstants.kLH;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
-                wristState = WristConstants.WristPositions.HORIZONTAL;
+                wristTarget = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 3: // 3 = L1 scoring position
                 armTarget = ArmConstants.kAC1;
                 liftTarget = ElevatorConstants.kLC1;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
-                wristState = WristConstants.WristPositions.VERTICAL;
+                wristTarget = WristConstants.WristPositions.VERTICAL;
                 break;
             case 4: // 4 = L2 scoring position
                 armTarget = ArmConstants.kAC2;
                 liftTarget = ElevatorConstants.kLC2;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
-                wristState = WristConstants.WristPositions.VERTICAL;
+                wristTarget = WristConstants.WristPositions.VERTICAL;
                 break;
             case 5: // 5 = L3 scoring position
                 armTarget = ArmConstants.kAC3;
                 liftTarget = ElevatorConstants.kLC3;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
-                wristState = WristConstants.WristPositions.VERTICAL;
+                wristTarget = WristConstants.WristPositions.VERTICAL;
                 break;
             case 6: // 6 = L4 scoring position
                 armTarget = ArmConstants.kAC4;
                 liftTarget = ElevatorConstants.kLC4;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
-                wristState = WristConstants.WristPositions.VERTICAL;
+                wristTarget = WristConstants.WristPositions.VERTICAL;
                 break; 
         }
     }

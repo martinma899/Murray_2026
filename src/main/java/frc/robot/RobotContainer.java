@@ -111,14 +111,16 @@ public class RobotContainer {
     Trigger intakeDown = new Trigger (m_intakelift::isIntakeDeployed);
     Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
     Trigger objectInClaw = new Trigger (m_clawroller::isCoralInClaw);
+    Trigger objectNotInClaw = new Trigger (m_clawroller::isCoralNotInClaw);
 
-    m_driverController.rightBumper().and(intakeDown).onTrue(m_intakeroller.turnOnIntakeCommand());
-    m_driverController.rightTrigger().onTrue(m_intakeroller.turnOffIntakeCommand());
+
+    m_driverController.rightTrigger().and(intakeDown).and(objectNotInClaw).onTrue(m_intakeroller.turnOnIntakeCommand());
+    m_driverController.rightTrigger().onFalse(m_intakeroller.turnOffIntakeCommand());
     objectInClaw.onTrue(m_intakeroller.turnOffIntakeCommand());
     intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
-    m_driverController.rightBumper().and(intakeDown).onTrue(m_clawroller.turnOnRollerCommand());
-    m_driverController.rightTrigger().onTrue(m_clawroller.turnOffRollerCommand());
+    m_driverController.rightTrigger().and(intakeDown).onTrue(m_clawroller.turnOnRollerCommand());
+    m_driverController.rightTrigger().onFalse(m_clawroller.turnOffRollerCommand());
 
     intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
 
