@@ -47,7 +47,7 @@ public class RobotContainer {
   private final elevator2 m_elevator = new elevator2();
   private final armlift m_armlift = new armlift();
   private final wrist m_wrist = new wrist();
-  private final statemachine m_statemachine = new statemachine(m_elevator,m_armlift,m_intakelift);
+  private final statemachine m_statemachine = new statemachine(m_elevator,m_armlift,m_intakelift,m_wrist);
   private final clawroller m_clawroller = new clawroller();
 
   //private final Command m_simpleLiftIntakeCommand = m_intakelift.simpleMotorSpeedControlCommand(-0.5);
@@ -214,9 +214,7 @@ public class RobotContainer {
     SmartDashboard.putData("wrist horizontal",m_wrist.moveWristHorizontalCommand());
     SmartDashboard.putData("wrist vertical",m_wrist.moveWristVerticalCommand());
     SmartDashboard.putData("release coral",m_clawroller.releaseCoralCommand());
-    SmartDashboard.putData("system go home",m_statemachine.moveSystemWrapperCommand(ArmConstants.kA0,
-                                                                                      ElevatorConstants.kL0,
-                                                                                      IntakeLiftingConstants.IntakePositions.RETRACTED));
+    SmartDashboard.putData("system go home",m_statemachine.moveToStartingPosCommand());
     SmartDashboard.putData("test next transition",m_statemachine.testNextTransitionCommand2());
     //SmartDashboard.putData("turn on intake",)
   }

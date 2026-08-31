@@ -3,12 +3,14 @@ package frc.robot.subsystems;
 import frc.robot.Constants.Safety;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.TestPositions;
+import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.IntakeLiftingConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.armlift;
 import frc.robot.subsystems.intakelift;
 import frc.robot.subsystems.elevator2;
+import frc.robot.subsystems.wrist;
 import frc.robot.SafetyUtilities;
 
 import java.util.Set;
@@ -27,9 +29,11 @@ public class statemachine extends SubsystemBase {
     private final elevator2 m_elevator; 
     private final armlift m_armlift; 
     private final intakelift m_intakelift;
+    private final wrist m_wrist;
 
     private int currentState;
     private IntakeLiftingConstants.IntakePositions intakeState;
+    private WristConstants.WristPositions wristState;
 
     private int testArrayInd = 0; // index for the test position arrays
     //private int testArrayLength = TestPositions.armTestTargetArray.length;
@@ -48,8 +52,8 @@ public class statemachine extends SubsystemBase {
 
     private double armTarget = TestPositions.a51; 
     private double liftTarget = TestPositions.l51;
-    
     private IntakeLiftingConstants.IntakePositions intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+    private WristConstants.WristPositions wristTarget = WristConstants.WristPositions.HORIZONTAL;
 
     private int stateTestOrderArrayLength = TestPositions.stateTestOrderArray.length;
     private int[] testValueAlt_arm = {0,0,0,0,0,0,0};
@@ -59,23 +63,27 @@ public class statemachine extends SubsystemBase {
     //private Command doNothing = runOnce(() -> {});
     //private Command liftToLS;
 
-    public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin) {
+    public statemachine(elevator2 elevatorin, armlift armliftin, intakelift intakeliftin, wrist wristin) {
         // pass in the object references
         m_elevator = elevatorin; 
         m_armlift = armliftin;
         m_intakelift = intakeliftin;
+        m_wrist = wristin;
     }
 
 // method to set the target actuator positions
-    public void setCommandedPositions(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
+    public void setCommandedPositions(double armPos, double liftPos, 
+    IntakeLiftingConstants.IntakePositions intakePos, WristConstants.WristPositions wristPos){
         armTarget = armPos;
         liftTarget = liftPos;
         intakeTarget = intakePos;
+        wristTarget = wristPos;
     }
 
     // returns the command to set the target actuator positions
-    public Command setCommandedPositionsCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
-        return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos));
+    public Command setCommandedPositionsCommand(double armPos, double liftPos, 
+    IntakeLiftingConstants.IntakePositions intakePos, WristConstants.WristPositions wristPos){
+        return runOnce(() -> setCommandedPositions(armPos, liftPos, intakePos, wristPos));
     }
 
     public Command testNextTransitionCommand2() {
@@ -90,8 +98,10 @@ public class statemachine extends SubsystemBase {
     }
 
     // returns the command to move the system to the commanded positions safely
-    public Command moveSystemWrapperCommand(double armPos, double liftPos, IntakeLiftingConstants.IntakePositions intakePos){
-        return setCommandedPositionsCommand(armPos, liftPos, intakePos)
+    public Command moveSystemWrapperCommand(double armPos, double liftPos, 
+    IntakeLiftingConstants.IntakePositions intakePos, 
+    WristConstants.WristPositions wristPos){
+        return setCommandedPositionsCommand(armPos, liftPos, intakePos, wristPos)
                 .andThen(moveSystemCommandDefer());
     }
 
@@ -117,21 +127,24 @@ public class statemachine extends SubsystemBase {
         return runOnce(()->competitionStateInd = 1)
         .andThen(moveSystemWrapperCommand(ArmConstants.kAI,
                                         ElevatorConstants.kLI,
-                                        IntakeLiftingConstants.IntakePositions.DEPLOYED));
+                                        IntakeLiftingConstants.IntakePositions.DEPLOYED,
+                                        WristConstants.WristPositions.HORIZONTAL));
     }
 
     public Command moveToHandoffPosCommand(){
         return runOnce(()->competitionStateInd = 2)
         .andThen(moveSystemWrapperCommand(ArmConstants.kAH,
                                         ElevatorConstants.kLH,
-                                        IntakeLiftingConstants.IntakePositions.DEPLOYED));
+                                        IntakeLiftingConstants.IntakePositions.DEPLOYED,
+                                        WristConstants.WristPositions.HORIZONTAL));
     }
 
     public Command moveToStartingPosCommand(){
         return runOnce(()->competitionStateInd = 0)
         .andThen(moveSystemWrapperCommand(ArmConstants.kA0,
                                         ElevatorConstants.kL0,
-                                        IntakeLiftingConstants.IntakePositions.RETRACTED));
+                                        IntakeLiftingConstants.IntakePositions.RETRACTED,
+                                        WristConstants.WristPositions.HORIZONTAL));
     }
 
     // the main deferred command returning the correct command to move the things to the correct positions safely
@@ -140,7 +153,7 @@ public class statemachine extends SubsystemBase {
         // for now assume intake is up
         return Commands.defer(
             () -> {return moveSystemCommand();},
-            Set.of(m_elevator,m_armlift,m_intakelift));// update current state
+            Set.of(m_elevator,m_armlift,m_intakelift,m_wrist));// update current state
     }
 
     // the method that returns the correct command to move things based on the
@@ -156,11 +169,15 @@ public class statemachine extends SubsystemBase {
         System.out.println("current arm position: " + m_armlift.getArmPosition() + " deg");
         System.out.println("current lift + arm state: " + currentState);
         System.out.println("current intake state: " + intakeState);
+        System.out.println("current wrist state: " + wristState);
 
         System.out.println("new lift position: " + liftTarget + " in");
         System.out.println("new arm position: " + armTarget + " deg");
         System.out.println("new lift + arm state: " + desiredState);
         System.out.println("new intake state: " + intakeTarget);
+        System.out.println("new wrist state: " + wristTarget);
+
+
 
         if (intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED
                 & intakeState == IntakeLiftingConstants.IntakePositions.RETRACTED) { // intake up tp intake up
@@ -735,6 +752,32 @@ public class statemachine extends SubsystemBase {
             }
         }
 
+        // append wrist command
+        if (wristTarget == WristConstants.WristPositions.VERTICAL &
+            ((desiredState == 1 | desiredState == 2 | desiredState == 3) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)
+             | (desiredState == 1 & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED)) { 
+                // all the cancel command cases
+                // wrist target is vertical, and target position is a situation that does not allow vertical wrist
+                // target stage 1 + intake up
+                // target state 1 + intake down
+                // target state 2 + intake down
+                // target state 3 + intake down
+            returnCommand = runOnce(() -> {});
+        } else if ( wristState == WristConstants.WristPositions.VERTICAL &
+                    wristTarget == WristConstants.WristPositions.HORIZONTAL &
+            ((desiredState == 1 | desiredState == 5 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED
+                    | intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED)) {
+            // all the wrist flip at beginning cases, all the cases are vert to horiz flip
+            returnCommand = m_wrist.moveWristHorizontalCommand().andThen(returnCommand);
+        } else if( wristState == WristConstants.WristPositions.HORIZONTAL &
+                   wristTarget == WristConstants.WristPositions.VERTICAL &
+            ((desiredState == 4 | desiredState == 5 | desiredState == 6 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.DEPLOYED
+                    | ((desiredState == 5 | desiredState == 7) & intakeTarget == IntakeLiftingConstants.IntakePositions.RETRACTED))) {
+            // all the wrist flip at end cases, all the cases are horiz to vert flip
+            returnCommand = returnCommand.andThen(m_wrist.moveWristVerticalCommand());
+        }
+        // by default all other commands are not modified for wrist movement
+
         returnCommand = returnCommand.finallyDo(() -> {
             System.out.println("Multi subsystem movement command completed.");
             System.out.println();
@@ -809,6 +852,11 @@ public class statemachine extends SubsystemBase {
             intakeState = IntakeLiftingConstants.IntakePositions.RETRACTED;
         }else{
             intakeState = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+        }
+        if (!m_wrist.isWristHorizontal()){
+            wristState = WristConstants.WristPositions.VERTICAL;
+        }else{
+            wristState = WristConstants.WristPositions.HORIZONTAL;
         }
     }
 
@@ -954,6 +1002,13 @@ public class statemachine extends SubsystemBase {
             intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
         }
 
+        // set test wrist position
+        if (TestPositions.stateTestWristArray[testArrayInd] == 1){ // 1 is vertical
+            wristTarget = WristConstants.WristPositions.VERTICAL;
+        } else { // 0 is horizontal
+            wristTarget = WristConstants.WristPositions.HORIZONTAL;
+        }
+
         incrementTestArrayIndex2();
          
     }
@@ -1016,36 +1071,43 @@ public class statemachine extends SubsystemBase {
                 armTarget = ArmConstants.kA0;
                 liftTarget = ElevatorConstants.kL0;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                wristState = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 1: // 1 = floor intake position
                 armTarget = ArmConstants.kAI;
                 liftTarget = ElevatorConstants.kLI;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+                wristState = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 2: // 2 = human handoff position
                 armTarget = ArmConstants.kAH;
                 liftTarget = ElevatorConstants.kLH;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.DEPLOYED;
+                wristState = WristConstants.WristPositions.HORIZONTAL;
                 break;
             case 3: // 3 = L1 scoring position
                 armTarget = ArmConstants.kAC1;
                 liftTarget = ElevatorConstants.kLC1;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                wristState = WristConstants.WristPositions.VERTICAL;
                 break;
             case 4: // 4 = L2 scoring position
                 armTarget = ArmConstants.kAC2;
                 liftTarget = ElevatorConstants.kLC2;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                wristState = WristConstants.WristPositions.VERTICAL;
                 break;
             case 5: // 5 = L3 scoring position
                 armTarget = ArmConstants.kAC3;
                 liftTarget = ElevatorConstants.kLC3;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                wristState = WristConstants.WristPositions.VERTICAL;
                 break;
             case 6: // 6 = L4 scoring position
                 armTarget = ArmConstants.kAC4;
                 liftTarget = ElevatorConstants.kLC4;
                 intakeTarget = IntakeLiftingConstants.IntakePositions.RETRACTED;
+                wristState = WristConstants.WristPositions.VERTICAL;
                 break; 
         }
     }
