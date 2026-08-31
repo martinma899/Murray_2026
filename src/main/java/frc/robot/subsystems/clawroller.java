@@ -38,9 +38,9 @@ public class clawroller extends SubsystemBase{
     public Command turnOnRollerCommand (){
         return run(()-> {
             if (isCoralInClaw()) {
-                setClawMotorSpeed(ClawRollerConstants.kIntakeRollerGripSpeed);
+                setClawMotorSpeed(ClawRollerConstants.kClawRollerGripSpeed);
             }else{
-                setClawMotorSpeed(ClawRollerConstants.kIntakeRollerInwardSpeed);
+                setClawMotorSpeed(ClawRollerConstants.kClawRollerInwardSpeed);
             }
         });
     }
@@ -52,8 +52,8 @@ public class clawroller extends SubsystemBase{
     }
 
     public Command releaseCoralCommand (){
-        return run(() -> setClawMotorSpeed(ClawRollerConstants.kIntakeRollerReleaseSpeed))
-            .withTimeout(ClawRollerConstants.kIntakeRollerReleaseTime)
+        return run(() -> setClawMotorSpeed(ClawRollerConstants.kClawRollerReleaseSpeed))
+            .withTimeout(ClawRollerConstants.kClawRollerReleaseTime)
             .andThen(runOnce(() -> stopClawMotor() ));
     }
 

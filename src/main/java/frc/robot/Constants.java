@@ -220,11 +220,11 @@ public final class Constants {
     public static boolean kClawRollerMotorInverted = false;
     public static int kClawRollerMotorCurrentLimit = 20; // amp
 
-    public static double kIntakeRollerInwardSpeed = 0.5; // intake in speed
-    public static double kIntakeRollerReleaseSpeed = -0.3; // intake reverse speed
-    public static double kIntakeRollerReleaseTime = 0.2; // release open time, s
+    public static double kClawRollerInwardSpeed = 0.5; // intake in speed
+    public static double kClawRollerReleaseSpeed = -0.1; // intake reverse speed
+    public static double kClawRollerReleaseTime = 0.2; // release open time, s
 
-    public static double kIntakeRollerGripSpeed = 0; // intake grip voltage in terms of duty cycle
+    public static double kClawRollerGripSpeed = 0; // intake grip voltage in terms of duty cycle
 
     public static int kCoralInClawThreshold = 700; // threshold above which coral is in claw
 
