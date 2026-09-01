@@ -49,6 +49,11 @@ public class intakeroller extends SubsystemBase {
     return runOnce(() -> stopIntakeMotor());
   }
 
+  public Command oneButtonWhileTrueCommand() {
+    return run(() -> setMotorSpeed(IntakeRollerConstants.kIntakeRollerInwardSpeed))
+    .finallyDo(this::stopIntakeMotor);
+  }
+
   public Command spitObjectOutCommand() {
     return run(() -> setMotorSpeed(IntakeRollerConstants.kIntakeRollerOutwardSpeed))
     .withTimeout(2.0)

@@ -109,23 +109,22 @@ public class RobotContainer {
 
     // intake roller manual control commands and logic
     Trigger intakeDown = new Trigger (m_intakelift::isIntakeDeployed);
-    Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
-    Trigger objectInClaw = new Trigger (m_clawroller::isCoralInClaw);
+    //Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
+    //Trigger objectInClaw = new Trigger (m_clawroller::isCoralInClaw);
     Trigger objectNotInClaw = new Trigger (m_clawroller::isCoralNotInClaw);
 
 
-    m_driverController.rightTrigger().and(intakeDown).and(objectNotInClaw).onTrue(m_intakeroller.turnOnIntakeCommand());
-    m_driverController.rightTrigger().onFalse(m_intakeroller.turnOffIntakeCommand());
-    objectInClaw.onTrue(m_intakeroller.turnOffIntakeCommand());
-    intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
+    m_driverController.rightTrigger().and(intakeDown).and(objectNotInClaw).whileTrue(m_intakeroller.oneButtonWhileTrueCommand());
+    //m_driverController.rightTrigger().onFalse(m_intakeroller.turnOffIntakeCommand());
+    //objectInClaw.onTrue(m_intakeroller.turnOffIntakeCommand());
+    //intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
-    m_driverController.rightTrigger().and(intakeDown).onTrue(m_clawroller.turnOnRollerCommand());
-    m_driverController.rightTrigger().onFalse(m_clawroller.turnOffRollerCommand());
-
-    intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
+    m_driverController.rightTrigger().and(intakeDown).whileTrue(m_clawroller.oneButtonWhileTrueCommand());
+    //m_driverController.rightTrigger().onFalse(m_clawroller.turnOffRollerCommand());
+    //intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
 
     // release coral command
-    m_driverController.povUp().onTrue(m_clawroller.releaseCoralCommand());
+    m_driverController.leftTrigger().onTrue(m_clawroller.releaseCoralCommand());
 
     //m_driverController.povRight().onTrue(m_elevator.setHeightCommand(18));
     //m_driverController.povDown().onTrue(m_elevator.goToBottomCommand());

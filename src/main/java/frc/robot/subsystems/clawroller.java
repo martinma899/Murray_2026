@@ -35,13 +35,16 @@ public class clawroller extends SubsystemBase{
         sensorReading = table.getIntegerTopic("ClawColorSensorIRReading").publish();
     }
 
-    public Command turnOnRollerCommand (){
+    public Command oneButtonWhileTrueCommand (){
         return run(()-> {
             if (isCoralInClaw()) {
                 setClawMotorSpeed(ClawRollerConstants.kClawRollerGripSpeed);
             }else{
                 setClawMotorSpeed(ClawRollerConstants.kClawRollerInwardSpeed);
             }
+        })
+        .finallyDo(()-> {
+            stopClawMotor();
         });
     }
 
