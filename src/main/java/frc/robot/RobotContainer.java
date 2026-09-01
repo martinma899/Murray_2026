@@ -112,6 +112,7 @@ public class RobotContainer {
     //Trigger intakeUp = new Trigger (m_intakelift::isIntakeRetracted);
     //Trigger objectInClaw = new Trigger (m_clawroller::isCoralInClaw);
     Trigger objectNotInClaw = new Trigger (m_clawroller::isCoralNotInClaw);
+    //objectNotInClaw.;
 
 
     m_driverController.rightTrigger().and(intakeDown).and(objectNotInClaw).whileTrue(m_intakeroller.oneButtonWhileTrueCommand());
@@ -119,7 +120,7 @@ public class RobotContainer {
     //objectInClaw.onTrue(m_intakeroller.turnOffIntakeCommand());
     //intakeUp.onTrue(m_intakeroller.turnOffIntakeCommand());
 
-    m_driverController.rightTrigger().and(intakeDown).whileTrue(m_clawroller.oneButtonWhileTrueCommand());
+    m_driverController.rightTrigger().whileTrue(m_clawroller.oneButtonWhileTrueCommand());
     //m_driverController.rightTrigger().onFalse(m_clawroller.turnOffRollerCommand());
     //intakeUp.onTrue(m_clawroller.turnOffRollerCommand());    
 
@@ -164,9 +165,9 @@ public class RobotContainer {
 
     // command to test the next transition in the state machine, for testing purposes
     // implementation is with built in cancel current running copy of the command and to start it again, so rapid button presses advance the states quickly
-    Command testTransitionCommand = m_statemachine.testNextTransitionCommand2();
-    m_driverController.povLeft().onTrue(Commands.runOnce(testTransitionCommand::cancel))
-    .onTrue(testTransitionCommand);
+    //Command testTransitionCommand = m_statemachine.testNextTransitionCommand2();
+    //m_driverController.povLeft().onTrue(Commands.runOnce(testTransitionCommand::cancel))
+    //.onTrue(testTransitionCommand);
 
     // command set to move among competition position sets
     
@@ -198,8 +199,8 @@ public class RobotContainer {
     //m_driverController.povRight().onTrue(m_wrist.moveWristVerticalCommand());
 
 
-    //m_driverController.leftBumper().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
-    //m_driverController.leftTrigger().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
+    m_driverController.povUp().whileTrue(m_armlift.jogWithSafetyCommand(0.1,m_elevator,m_intakelift));
+    m_driverController.povDown().whileTrue(m_armlift.jogWithSafetyCommand(-0.1,m_elevator,m_intakelift));
 
     //m_driverController.povUp().whileTrue(m_elevator.jogWithSafetyCommand(0.5,m_armlift,m_intakelift));
     //m_driverController.povDown().whileTrue(m_elevator.jogWithSafetyCommand(-0.5,m_armlift,m_intakelift));

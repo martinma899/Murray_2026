@@ -25,6 +25,7 @@ public class clawroller extends SubsystemBase{
 
     private IntegerPublisher sensorReading;
 
+    private int loopCounter = 0; 
 
     public clawroller() {
         m_clawmotor = new SparkMax(ClawRollerConstants.kClawRollerMotorCanID,MotorType.kBrushless);
@@ -36,13 +37,19 @@ public class clawroller extends SubsystemBase{
     }
 
     public Command oneButtonWhileTrueCommand (){
-        return run(()-> {
+        // first run the claw for 0.5s at intake speed
+        // this ensures when coral is gripped incorrectly I can press intake button and correct without stalling motor
+        // otherwise if coral is not in claw it acts like just turning on the claw
+        return run(() -> setClawMotorSpeed(ClawRollerConstants.kClawRollerInwardSpeed))
+        .withTimeout(0.2)
+        .andThen(
+        run(()-> {
             if (isCoralInClaw()) {
                 setClawMotorSpeed(ClawRollerConstants.kClawRollerGripSpeed);
             }else{
                 setClawMotorSpeed(ClawRollerConstants.kClawRollerInwardSpeed);
             }
-        })
+        }))
         .finallyDo(()-> {
             stopClawMotor();
         });
@@ -72,7 +79,7 @@ public class clawroller extends SubsystemBase{
 
     // check if coral is in claw by checking if the sensor distance value is below a threshold
     public boolean isCoralInClaw(){
-        proximity = m_colorSensor.getProximity();
+        //proximity = m_colorSensor.getProximity();
         return proximity > ClawRollerConstants.kCoralInClawThreshold;
     }
 
@@ -82,8 +89,17 @@ public class clawroller extends SubsystemBase{
 
     @Override
     public void periodic (){
-        proximity = m_colorSensor.getProximity();
-        sensorReading.set(proximity);
+
+
+        loopCounter++;
+  
+        // Only query the I2C device once every 25 loops (Approx. once per 0.5 second)
+        if (loopCounter >= 25) {
+            loopCounter = 0;
+            proximity = m_colorSensor.getProximity();
+            sensorReading.set(proximity);
+        }
+
     }
 
     

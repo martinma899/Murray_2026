@@ -201,7 +201,7 @@ public final class Constants {
     public static boolean kIntakeRollerMotorInverted = false; 
     public static int kIntakeRollerMotorCurrentLimit = 30; // amp
 
-    public static double kIntakeRollerInwardSpeed = 0.8; // intake in speed
+    public static double kIntakeRollerInwardSpeed = 1; // intake in speed
     public static double kIntakeRollerOutwardSpeed = -0.3; // intake reverse speed
 
     public static SparkMaxConfig kIntakeRollerConfig = new SparkMaxConfig();
@@ -226,7 +226,7 @@ public final class Constants {
 
     public static double kClawRollerGripSpeed = 0; // intake grip voltage in terms of duty cycle
 
-    public static int kCoralInClawThreshold = 700; // threshold above which coral is in claw
+    public static int kCoralInClawThreshold = 650; // threshold above which coral is in claw
 
     public static SparkMaxConfig kClawRollerConfig = new SparkMaxConfig();
 
